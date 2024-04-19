@@ -1,6 +1,0 @@
-@SkiResort.Presentation_HostAddress = http://localhost:5117
-
-GET {{SkiResort.Presentation_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
