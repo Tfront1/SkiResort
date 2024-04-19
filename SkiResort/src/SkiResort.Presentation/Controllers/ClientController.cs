@@ -32,7 +32,7 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(UpdateDeleteClientDto updateDeleteClientDto)
+        public async Task<IActionResult> Delete(ClientDto updateDeleteClientDto)
         {
             var client = updateDeleteClientDto.Adapt<Client>();
 
@@ -42,11 +42,11 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(UpdateDeleteClientDto updateDeleteClientDto)
+        public async Task<IActionResult> Update(ClientDto updateDeleteClientDto)
         {
             var client = updateDeleteClientDto.Adapt<Client>();
 
-            var updatedClient = (await repository.Update(client)).Adapt<UpdateDeleteClientDto>();
+            var updatedClient = (await repository.Update(client)).Adapt<ClientDto>();
 
             return Ok(updatedClient);
         }
@@ -54,7 +54,7 @@ namespace SkiResort.Presentation.Controllers
         [HttpGet("GetById")]
         public async Task<IActionResult> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<GetClientDto>();
+            var client = (await repository.GetById(id)).Adapt<ClientDto>();
 
             if (client is null)
             {
@@ -69,7 +69,7 @@ namespace SkiResort.Presentation.Controllers
         {
             var clients = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<GetClientDto>();
+            var clientDtos = clients.ProjectToType<ClientDto>();
 
             if (clientDtos.Count() == 0)
             {

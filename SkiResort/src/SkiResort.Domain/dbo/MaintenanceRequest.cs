@@ -2,7 +2,7 @@
 
 namespace SkiResort.Domain.dbo;
 
-public class MaintenanceRequest
+public class MaintenanceRequest : IKeyedEntity<int>
 {
     [Key]
     public int Id { get; set; }

@@ -2,7 +2,7 @@
 
 namespace SkiResort.Domain.dbo;
 
-public class Employee
+public class Employee : IKeyedEntity<int>
 {
     [Key]
     public int Id { get; set; }

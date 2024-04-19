@@ -2,7 +2,7 @@
 
 namespace SkiResort.Domain.dbo;
 
-public class Event
+public class Event : IKeyedEntity<int>
 {
     [Key]
     public int Id { get; set; }

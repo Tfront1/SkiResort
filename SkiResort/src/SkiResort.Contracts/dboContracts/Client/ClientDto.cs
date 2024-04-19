@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace SkiResort.Contracts.dboContracts.Client;
 
-public class UpdateDeleteClientDto
+public class ClientDto
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
-    public required string Phone { get; set; }
-    public required string Email { get; set; }
-    public required DateTime DateOfBirth { get; set; }
+    public string? Phone { get; set; }
+    public string? Email { get; set; }
+    public DateTime? DateOfBirth { get; set; }
 }

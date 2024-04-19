@@ -2,7 +2,7 @@
 
 namespace SkiResort.Domain.dbo;
 
-public class WeatherReport
+public class WeatherReport : IKeyedEntity<int>
 {
     [Key]
     public int Id { get; set; }

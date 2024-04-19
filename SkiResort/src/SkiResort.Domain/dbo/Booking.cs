@@ -3,7 +3,7 @@
 namespace SkiResort.Domain.dbo;
 
 
-public class Booking
+public class Booking : IKeyedEntity<int>
 {
     [Key]
     public int Id { get; set; }
