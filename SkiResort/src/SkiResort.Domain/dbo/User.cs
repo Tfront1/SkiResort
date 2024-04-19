@@ -5,8 +5,8 @@ namespace SkiResort.Domain.dbo;
 public class User
 {
     [Key]
-    public Guid Id { get; set; }
-    public Guid RoleId { get; set; }
+    public int Id { get; set; }
+    public int RoleId { get; set; }
     public required string Username { get; set; }
     public required string Password { get; set; }
     public required string Email { get; set; } 

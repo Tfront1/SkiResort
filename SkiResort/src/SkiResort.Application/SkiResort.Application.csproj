@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SkiResort.Domain\SkiResort.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

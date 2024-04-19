@@ -5,7 +5,7 @@ namespace SkiResort.Domain.dbo;
 public class Room
 {
     [Key]
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     public required string Type { get; set; }
     public decimal PricePerNight { get; set; }
     public int Capacity { get; set; }

@@ -2,10 +2,10 @@
 
 namespace SkiResort.Domain.dbo;
 
-public class Client
+public class Client : IKeyedEntity<int>
 {
     [Key]
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
     public string? Phone { get; set; }

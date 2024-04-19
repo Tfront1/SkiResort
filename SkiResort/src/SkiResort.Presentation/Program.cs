@@ -1,5 +1,8 @@
+using Mapster;
 using Microsoft.EntityFrameworkCore;
+using SkiResort.Application.Repositories;
 using SkiResort.Infrastructure.Database;
+using SkiResort.Infrastructure.Repositories;
 
 namespace SkiResort.Presentation;
 
@@ -19,6 +22,10 @@ public class Program
 
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        builder.Services.AddTransient(typeof(IEntityRepositoryBase<,>), typeof(EntityRepositoryBase<,>));
+
+        builder.Services.AddMapster();
 
         var app = builder.Build();
 

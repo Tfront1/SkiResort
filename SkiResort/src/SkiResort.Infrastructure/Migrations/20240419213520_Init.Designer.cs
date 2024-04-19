@@ -12,7 +12,7 @@ using SkiResort.Infrastructure.Database;
 namespace SkiResort.Infrastructure.Migrations
 {
     [DbContext(typeof(SkiResortInternalContext))]
-    [Migration("20240418201807_Init")]
+    [Migration("20240419213520_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -27,9 +27,11 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Booking", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CheckInDate")
                         .HasColumnType("timestamp with time zone");
@@ -37,11 +39,11 @@ namespace SkiResort.Infrastructure.Migrations
                     b.Property<DateTime>("CheckOutDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("ClientId")
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("RoomId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("RoomId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -58,9 +60,11 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Client", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("timestamp with time zone");
@@ -86,40 +90,13 @@ namespace SkiResort.Infrastructure.Migrations
                     b.ToTable("Clients");
                 });
 
-            modelBuilder.Entity("SkiResort.Domain.dbo.Employee", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Department")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("Position")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Employees");
-                });
-
             modelBuilder.Entity("SkiResort.Domain.dbo.Equipment", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -132,18 +109,20 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.EquipmentRental", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("EquipmentId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("RentalPrice")
                         .HasColumnType("decimal(18,2)");
@@ -162,9 +141,11 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Event", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
@@ -187,9 +168,11 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Instructor", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -209,39 +192,19 @@ namespace SkiResort.Infrastructure.Migrations
                     b.ToTable("Instructors");
                 });
 
-            modelBuilder.Entity("SkiResort.Domain.dbo.Lift", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Lifts");
-                });
-
             modelBuilder.Entity("SkiResort.Domain.dbo.MaintenanceRequest", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("EquipmentId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("EquipmentId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
@@ -257,33 +220,13 @@ namespace SkiResort.Infrastructure.Migrations
                     b.ToTable("MaintenanceRequests");
                 });
 
-            modelBuilder.Entity("SkiResort.Domain.dbo.Payroll", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid>("EmployeeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("PayDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("Payrolls");
-                });
-
             modelBuilder.Entity("SkiResort.Domain.dbo.Role", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("RoleName")
                         .IsRequired()
@@ -296,9 +239,11 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Room", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Capacity")
                         .HasColumnType("integer");
@@ -317,9 +262,11 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Service", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -338,18 +285,20 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.ServiceOrder", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ServiceId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("ServiceId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -362,18 +311,20 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.SkiLesson", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClientId")
+                        .HasColumnType("integer");
 
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("interval");
 
-                    b.Property<Guid>("InstructorId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("InstructorId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("timestamp with time zone");
@@ -389,9 +340,11 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Slope", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("DifficultyLevel")
                         .IsRequired()
@@ -411,15 +364,17 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Ticket", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<Guid>("EventId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("ClientId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -436,33 +391,13 @@ namespace SkiResort.Infrastructure.Migrations
                     b.ToTable("Tickets");
                 });
 
-            modelBuilder.Entity("SkiResort.Domain.dbo.Transportation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Capacity")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Schedule")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Transportations");
-                });
-
             modelBuilder.Entity("SkiResort.Domain.dbo.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -475,8 +410,8 @@ namespace SkiResort.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -491,9 +426,11 @@ namespace SkiResort.Infrastructure.Migrations
 
             modelBuilder.Entity("SkiResort.Domain.dbo.WeatherReport", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
@@ -557,17 +494,6 @@ namespace SkiResort.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Equipment");
-                });
-
-            modelBuilder.Entity("SkiResort.Domain.dbo.Payroll", b =>
-                {
-                    b.HasOne("SkiResort.Domain.dbo.Employee", "Employee")
-                        .WithMany("Payrolls")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.ServiceOrder", b =>
@@ -649,11 +575,6 @@ namespace SkiResort.Infrastructure.Migrations
                     b.Navigation("SkiLessons");
 
                     b.Navigation("Tickets");
-                });
-
-            modelBuilder.Entity("SkiResort.Domain.dbo.Employee", b =>
-                {
-                    b.Navigation("Payrolls");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Equipment", b =>
