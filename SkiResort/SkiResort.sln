@@ -3,15 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34622.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiResort.Presentation", "src\SkiResort.Presentation\SkiResort.Presentation.csproj", "{DF438713-1711-4649-AF3C-01F3EF3D9A3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkiResort.Presentation", "src\SkiResort.Presentation\SkiResort.Presentation.csproj", "{DF438713-1711-4649-AF3C-01F3EF3D9A3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiResort.Domain", "src\SkiResort.Domain\SkiResort.Domain.csproj", "{B1813AA2-B1E7-418E-8F2F-AE36E66A33D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkiResort.Domain", "src\SkiResort.Domain\SkiResort.Domain.csproj", "{B1813AA2-B1E7-418E-8F2F-AE36E66A33D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiResort.Application", "src\SkiResort.Application\SkiResort.Application.csproj", "{7F8B3F8C-44B5-4120-A25E-8A141DA11AFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkiResort.Application", "src\SkiResort.Application\SkiResort.Application.csproj", "{7F8B3F8C-44B5-4120-A25E-8A141DA11AFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiResort.Contracts", "src\SkiResort.Contracts\SkiResort.Contracts.csproj", "{0B15F8E0-47D9-4FDD-8297-6374EA120C80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkiResort.Contracts", "src\SkiResort.Contracts\SkiResort.Contracts.csproj", "{0B15F8E0-47D9-4FDD-8297-6374EA120C80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiResort.Infrastructure", "src\SkiResort.Infrastructure\SkiResort.Infrastructure.csproj", "{8BEABAD8-81D5-4DCC-80B6-1EA59F6E1184}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkiResort.Infrastructure", "src\SkiResort.Infrastructure\SkiResort.Infrastructure.csproj", "{8BEABAD8-81D5-4DCC-80B6-1EA59F6E1184}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{A2B54CA9-6766-4CF5-8D80-160AA3DCEE70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiResort.Frontend.Presentation", "src\Frontend\SkiResort.Frontend.Presentation\SkiResort.Frontend.Presentation.csproj", "{1D86FAE8-2577-4A81-B178-3A359F61404B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,9 +43,16 @@ Global
 		{8BEABAD8-81D5-4DCC-80B6-1EA59F6E1184}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BEABAD8-81D5-4DCC-80B6-1EA59F6E1184}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BEABAD8-81D5-4DCC-80B6-1EA59F6E1184}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D86FAE8-2577-4A81-B178-3A359F61404B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D86FAE8-2577-4A81-B178-3A359F61404B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D86FAE8-2577-4A81-B178-3A359F61404B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D86FAE8-2577-4A81-B178-3A359F61404B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1D86FAE8-2577-4A81-B178-3A359F61404B} = {A2B54CA9-6766-4CF5-8D80-160AA3DCEE70}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {60B600BF-0EB7-49F6-9C1E-B83A7BC6495B}
