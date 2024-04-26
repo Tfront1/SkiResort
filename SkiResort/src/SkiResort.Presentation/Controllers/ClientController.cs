@@ -5,7 +5,7 @@ using SkiResort.Application.Repositories;
 using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Client;
 using SkiResort.Domain.dbo;
-using System.Linq;
+using System.Linq.Dynamic.Core;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -81,13 +81,21 @@ namespace SkiResort.Presentation.Controllers
             return Ok(clientDtos);
         }
 
-        [HttpPost("ClientGetPaginated")]
-        public async Task<List<ClientDto>> GetPaginated(PaginationRequest paginationRequest)
+        [HttpPost("ClientGetPaginatedSorted")]
+        public async Task<List<ClientDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
         {
             var clients = (await repository.GetAll()).AsQueryable();
 
-            clients = clients.Skip((paginationRequest.PageIndex -1) * paginationRequest.PageSize);
-            clients = clients.Take(paginationRequest.PageSize);
+            // Apply sorting
+            if (!string.IsNullOrEmpty(paginationSortingRequest.SortBy))
+            {
+                var direction = paginationSortingRequest.Ascending ? "ascending" : "descending";
+                clients = clients.OrderBy($"{paginationSortingRequest.SortBy} {direction}");
+            }
+
+            // Apply pagination
+            clients = clients.Skip((paginationSortingRequest.PageIndex - 1) * paginationSortingRequest.PageSize)
+                             .Take(paginationSortingRequest.PageSize);
 
             var clientDtos = clients.ProjectToType<ClientDto>();
 

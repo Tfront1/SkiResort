@@ -8,3 +8,8 @@
 .m-2 {
     margin: 0.5rem !important;
 }
+
+clickable {
+    cursor: pointer;
+    user-select: none;
+}

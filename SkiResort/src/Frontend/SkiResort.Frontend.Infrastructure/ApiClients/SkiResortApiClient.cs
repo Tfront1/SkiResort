@@ -823,15 +823,15 @@ namespace SkiResortApiClient
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ClientDto>> ClientGetPaginatedAsync(PaginationRequest body)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ClientDto>> ClientGetPaginatedSortedAsync(PaginationSortingRequest body)
         {
-            return ClientGetPaginatedAsync(body, System.Threading.CancellationToken.None);
+            return ClientGetPaginatedSortedAsync(body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ClientDto>> ClientGetPaginatedAsync(PaginationRequest body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ClientDto>> ClientGetPaginatedSortedAsync(PaginationSortingRequest body, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -848,8 +848,8 @@ namespace SkiResortApiClient
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "api/Client/ClientGetPaginated"
-                    urlBuilder_.Append("api/Client/ClientGetPaginated");
+                    // Operation Path: "api/Client/ClientGetPaginatedSorted"
+                    urlBuilder_.Append("api/Client/ClientGetPaginatedSorted");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -7500,13 +7500,19 @@ namespace SkiResortApiClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.7.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class PaginationRequest
+    public partial class PaginationSortingRequest
     {
         [Newtonsoft.Json.JsonProperty("pageIndex", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int PageIndex { get; set; }
 
         [Newtonsoft.Json.JsonProperty("pageSize", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int PageSize { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("sortBy", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SortBy { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("ascending", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public bool Ascending { get; set; }
 
     }
 

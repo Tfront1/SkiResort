@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace SkiResort.Contracts;
 
-public class PaginationRequest
+public class PaginationSortingRequest
 {
     public int PageIndex { get; set; }
     public int PageSize { get; set; } = 10;
+    public string SortBy { get; set; } = "Id";
+    public bool Ascending { get; set; } = true;
 }
