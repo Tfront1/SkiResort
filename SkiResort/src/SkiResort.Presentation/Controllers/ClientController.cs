@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Client;
 using SkiResort.Domain.dbo;
+using System.Linq;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -51,7 +53,7 @@ namespace SkiResort.Presentation.Controllers
             return Ok(updatedClient);
         }
 
-        [HttpGet("GetById")]
+        [HttpGet("ClientGetById")]
         public async Task<IActionResult> GetById(int id)
         {
             var client = (await repository.GetById(id)).Adapt<ClientDto>();
@@ -64,7 +66,7 @@ namespace SkiResort.Presentation.Controllers
             return Ok(client);
         }
 
-        [HttpGet("GetAll")]
+        [HttpGet("ClientGetAll")]
         public async Task<IActionResult> GetAll()
         {
             var clients = (await repository.GetAll()).AsQueryable();
@@ -77,6 +79,19 @@ namespace SkiResort.Presentation.Controllers
             }
 
             return Ok(clientDtos);
+        }
+
+        [HttpPost("ClientGetPaginated")]
+        public async Task<List<ClientDto>> GetPaginated(PaginationRequest paginationRequest)
+        {
+            var clients = (await repository.GetAll()).AsQueryable();
+
+            clients = clients.Skip((paginationRequest.PageIndex -1) * paginationRequest.PageSize);
+            clients = clients.Take(paginationRequest.PageSize);
+
+            var clientDtos = clients.ProjectToType<ClientDto>();
+
+            return clientDtos.ToList();
         }
     }
 }

@@ -51,7 +51,7 @@ namespace SkiResort.Presentation.Controllers
             return Ok(updatedEquipment);
         }
 
-        [HttpGet("GetById")]
+        [HttpGet("EquipmentGetById")]
         public async Task<IActionResult> GetById(int id)
         {
             var client = (await repository.GetById(id)).Adapt<EquipmentDto>();
@@ -64,7 +64,7 @@ namespace SkiResort.Presentation.Controllers
             return Ok(client);
         }
 
-        [HttpGet("GetAll")]
+        [HttpGet("EquipmentGetAll")]
         public async Task<IActionResult> GetAll()
         {
             var clients = (await repository.GetAll()).AsQueryable();

@@ -1,0 +1,88 @@
+﻿@page "/clients"
+@using System.Net.Http.Json
+@inject IHttpApiClientFactory HttpApiClientFactory
+
+<h3>Clients</h3>
+
+@if (clients == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in clients)
+            {
+                <tr>
+                    <td>@client.FirstName</td>
+                    <td>@client.LastName</td>
+                    <td>@client.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center align-items-center mt-3">
+        <button class="btn btn-primary btn-lg m-2" @onclick="LoadPrevious">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <span class="mx-3">@pageIndex</span>
+
+        <button class="btn btn-primary btn-lg m-2" @onclick="LoadNext">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+}
+
+@code {
+    private SkiResortApiClient skiResortApiClient;
+    private List<ClientDto> clients;
+    private int pageIndex = 1;
+    private int pageSize = 10;
+
+    protected override async Task OnInitializedAsync()
+    {
+        skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
+        clients = await LoadData(pageIndex, pageSize);
+    }
+
+    private async Task<List<ClientDto>> LoadData(int pageIndex, int pageSize)
+    {
+        var req = new PaginationRequest
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+            };
+
+        return (await skiResortApiClient!.ClientGetPaginatedAsync(req)).ToList();
+    }
+
+    private async Task LoadNext()
+    {
+        var res = await LoadData(pageIndex + 1, pageSize);
+        if (res is null || res.Count() == 0)
+        {
+            return;
+        }
+        pageIndex++;
+        clients = res;
+    }
+
+    private async Task LoadPrevious()
+    {
+        if (pageIndex > 1)
+        {
+            pageIndex--;
+            clients = await LoadData(pageIndex, pageSize);
+        }
+    }
+}

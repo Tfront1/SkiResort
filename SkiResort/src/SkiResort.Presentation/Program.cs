@@ -1,5 +1,6 @@
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using SkiResort.Application.Repositories;
 using SkiResort.Infrastructure.Database;
 using SkiResort.Infrastructure.Repositories;
@@ -21,7 +22,10 @@ public class Program
         builder.Services.AddControllers();
 
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+
+        builder.Services.AddSwaggerGen( c =>
+            c.SwaggerDoc("v1", new OpenApiInfo() {Title = "SkiResort.API", Version = "v1" }
+            ));
 
         builder.Services.AddTransient(typeof(IEntityRepositoryBase<,>), typeof(EntityRepositoryBase<,>));
 
@@ -32,9 +36,10 @@ public class Program
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(c => 
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "SkiResortApi v1"));
         }
-
+       
         app.UseHttpsRedirection();
 
         app.UseAuthorization();

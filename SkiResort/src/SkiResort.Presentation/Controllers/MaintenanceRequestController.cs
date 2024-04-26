@@ -51,7 +51,7 @@ namespace SkiResort.Presentation.Controllers
             return Ok(updatedMaintenanceRequest);
         }
 
-        [HttpGet("GetById")]
+        [HttpGet("MaintenanceRequestGetById")]
         public async Task<IActionResult> GetById(int id)
         {
             var client = (await repository.GetById(id)).Adapt<MaintenanceRequestDto>();
@@ -64,7 +64,7 @@ namespace SkiResort.Presentation.Controllers
             return Ok(client);
         }
 
-        [HttpGet("GetAll")]
+        [HttpGet("MaintenanceRequestGetAll")]
         public async Task<IActionResult> GetAll()
         {
             var clients = (await repository.GetAll()).AsQueryable();
