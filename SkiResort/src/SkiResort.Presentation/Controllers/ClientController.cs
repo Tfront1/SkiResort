@@ -1,10 +1,12 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SkiResort.Application.Repositories;
 using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Client;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 using System.Linq.Dynamic.Core;
 
 namespace SkiResort.Presentation.Controllers
@@ -84,22 +86,15 @@ namespace SkiResort.Presentation.Controllers
         [HttpPost("ClientGetPaginatedSorted")]
         public async Task<List<ClientDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            // Apply sorting
-            if (!string.IsNullOrEmpty(paginationSortingRequest.SortBy))
-            {
-                var direction = paginationSortingRequest.Ascending ? "ascending" : "descending";
-                clients = clients.OrderBy($"{paginationSortingRequest.SortBy} {direction}");
-            }
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
 
-            // Apply pagination
-            clients = clients.Skip((paginationSortingRequest.PageIndex - 1) * paginationSortingRequest.PageSize)
-                             .Take(paginationSortingRequest.PageSize);
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
 
-            var clientDtos = clients.ProjectToType<ClientDto>();
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
 
-            return clientDtos.ToList();
+            return query.ProjectToType<ClientDto>().ToList();
         }
     }
 }

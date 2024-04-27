@@ -10,6 +10,7 @@
 }
 else
 {
+    <input type="text" placeholder="Search..." @bind="req.Filter" @bind:event="oninput" @onkeyup="ApplyFilter" />
     <table class="table">
         <thead>
             <tr>
@@ -29,14 +30,14 @@ else
             }
         </tbody>
     </table>
-    @if (pageIndex != 1)
+    @if (req.PageIndex != 1)
     {
         <div class="d-flex justify-content-center align-items-center mt-3">
             <button class="btn btn-primary btn-lg m-2" @onclick="LoadPrevious">
                 <i class="fas fa-chevron-left"></i>
             </button>
 
-            <span class="mx-3">@pageIndex</span>
+            <span class="mx-3">@req.PageIndex</span>
 
             <button class="btn btn-primary btn-lg m-2" @onclick="LoadNext">
                 <i class="fas fa-chevron-right"></i>
@@ -45,14 +46,14 @@ else
     }
     else
     {
-        @if (clients.Count() == pageSize)
+        @if (clients.Count() == req.PageSize)
         {
             <div class="d-flex justify-content-center align-items-center mt-3">
                 <button class="btn btn-primary btn-lg m-2" @onclick="LoadPrevious">
                     <i class="fas fa-chevron-left"></i>
                 </button>
 
-                <span class="mx-3">@pageIndex</span>
+                <span class="mx-3">@req.PageIndex</span>
 
                 <button class="btn btn-primary btn-lg m-2" @onclick="LoadNext">
                     <i class="fas fa-chevron-right"></i>
@@ -60,68 +61,81 @@ else
             </div>
         }
     }
-
 }
 
 @code {
-    private SkiResortApiClient skiResortApiClient;
-    private List<ClientDto> clients;
-    private int pageIndex = 1;
-    private int pageSize = 10;
-    private string currentSortColumn = nameof(ClientDto.Id);
-    private bool isAscending = true;
+    private SkiResortApiClient? skiResortApiClient;
+    private List<ClientDto>? clients;
+
+    private PaginationSortingRequest req = new PaginationSortingRequest
+        {
+            PageIndex = 1,
+            PageSize = 10,
+            SortBy = nameof(ClientDto.Id),
+            Ascending = true,
+            Filter = "",
+        };
 
     protected override async Task OnInitializedAsync()
     {
         skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
-        clients = await LoadData(pageIndex, pageSize);
+        clients = await LoadData(req);
     }
 
-    private async Task<List<ClientDto>> LoadData(int pageIndex, int pageSize)
+    private async Task<List<ClientDto>> LoadData(PaginationSortingRequest req)
     {
-        var req = new PaginationSortingRequest
-            {
-                PageIndex = pageIndex,
-                PageSize = pageSize,
-                SortBy = currentSortColumn,
-                Ascending = isAscending
-            };
-
         return (await skiResortApiClient!.ClientGetPaginatedSortedAsync(req)).ToList();
     }
 
     private async Task LoadNext()
     {
-        var res = await LoadData(pageIndex + 1, pageSize);
+        PaginationSortingRequest reqTemp = new PaginationSortingRequest
+        {
+            PageIndex = req.PageIndex + 1,
+            PageSize = req.PageSize,
+            SortBy = req.SortBy,
+            Ascending = req.Ascending,
+            Filter = req.Filter,
+        };
+
+        var res = await LoadData(reqTemp);
+
         if (res is null || res.Count() == 0)
         {
             return;
         }
-        pageIndex++;
+
+        req.PageIndex++;
         clients = res;
     }
 
     private async Task LoadPrevious()
     {
-        if (pageIndex > 1)
+        if (req.PageIndex > 1)
         {
-            pageIndex--;
-            clients = await LoadData(pageIndex, pageSize);
+            req.PageIndex--;
+            clients = await LoadData(req);
         }
     }
 
     private async Task ApplySorting(string columnName)
     {
-        if (currentSortColumn == columnName)
+        if (req.SortBy == columnName)
         {
-            isAscending = !isAscending;
+            req.Ascending = !req.Ascending;
         }
         else
         {
-            currentSortColumn = columnName;
-            isAscending = true;
+            req.SortBy = columnName;
+            req.Ascending = true;
         }
 
-        clients = await LoadData(pageIndex, pageSize);
+        clients = await LoadData(req);
+    }
+
+    private async Task ApplyFilter(KeyboardEventArgs args)
+    {
+        req.PageIndex = 1;
+        clients = await LoadData(req);
     }
 }

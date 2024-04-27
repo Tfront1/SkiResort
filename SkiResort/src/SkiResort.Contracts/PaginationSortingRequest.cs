@@ -12,4 +12,6 @@ public class PaginationSortingRequest
     public int PageSize { get; set; } = 10;
     public string SortBy { get; set; } = "Id";
     public bool Ascending { get; set; } = true;
+    public string Filter { get; set; }
+
 }
