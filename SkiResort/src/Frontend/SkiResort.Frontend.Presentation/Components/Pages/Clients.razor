@@ -1,6 +1,10 @@
 ﻿@page "/clients"
 @using System.Net.Http.Json
+@using System.Text.Json
+@using System.Xml.Serialization
+@using System.Text
 @inject IHttpApiClientFactory HttpApiClientFactory
+@inject IJSRuntime JsInterop
 
 <h3>Clients</h3>
 
@@ -10,26 +14,41 @@
 }
 else
 {
-    <input type="text" placeholder="Search..." @bind="req.Filter" @bind:event="oninput" @onkeyup="ApplyFilter" />
+    <div class="export-buttons">
+        <input type="text" placeholder="Search..." @bind="req.Filter" @bind:event="oninput" @onkeyup="ApplyFilter" />
+        <button class="btn btn-success" style="margin-left: 3px;" @onclick="ExportAsCsv">CSV</button>
+        <button class="btn btn-info" style="margin-left: 3px;" @onclick="ExportAsXml">XML</button>
+        <button class="btn btn-warning" style="margin-left: 3px;" @onclick="ExportAsJson">JSON</button>
+    </div>
+
     <table class="table">
         <thead>
             <tr>
-                <th @onclick="() => ApplySorting(nameof(ClientDto.FirstName))">First Name</th>
-                <th @onclick="() => ApplySorting(nameof(ClientDto.LastName))">Last Name</th>
-                <th @onclick="() => ApplySorting(nameof(ClientDto.Email))">Email</th>
+                <th>Id</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var client in clients)
             {
                 <tr>
+                    <td>@client.Id</td>
                     <td>@client.FirstName</td>
                     <td>@client.LastName</td>
+                    <td>@client.Phone</td>
                     <td>@client.Email</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteClient(client)">Delete</button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
+
     @if (req.PageIndex != 1)
     {
         <div class="d-flex justify-content-center align-items-center mt-3">
@@ -65,7 +84,9 @@ else
 
 @code {
     private SkiResortApiClient? skiResortApiClient;
+    private ClientDto selectedClient = new ClientDto();
     private List<ClientDto>? clients;
+
 
     private PaginationSortingRequest req = new PaginationSortingRequest
         {
@@ -85,6 +106,16 @@ else
     private async Task<List<ClientDto>> LoadData(PaginationSortingRequest req)
     {
         return (await skiResortApiClient!.ClientGetPaginatedSortedAsync(req)).ToList();
+    }
+
+    private async Task DeleteClient(ClientDto client)
+    {
+        var confirmed = await JsInterop.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {client.FirstName} {client.LastName}?");
+        if (confirmed)
+        {
+            await skiResortApiClient.ClientDELETEAsync(client);
+            clients.Remove(client);
+        }
     }
 
     private async Task LoadNext()
@@ -137,5 +168,49 @@ else
     {
         req.PageIndex = 1;
         clients = await LoadData(req);
+    }
+
+    private async Task ExportAsCsv()
+    {
+        var csvData = GenerateCsv(clients);
+        await SaveAsFile("clients.csv", csvData);
+    }
+
+    private async Task ExportAsXml()
+    {
+        var xmlData = GenerateXml(clients);
+        await SaveAsFile("clients.xml", xmlData);
+    }
+
+    private async Task ExportAsJson()
+    {
+        var jsonData = JsonSerializer.Serialize(clients);
+        await SaveAsFile("clients.json", jsonData);
+    }
+
+    private string GenerateCsv(List<ClientDto> clients)
+    {
+        var stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine("Id,FirstName,LastName,Phone,Email");
+
+        foreach (var client in clients)
+        {
+            stringBuilder.AppendLine($"{client.Id},{client.FirstName},{client.LastName},{client.Phone},{client.Email}");
+        }
+
+        return stringBuilder.ToString();
+    }
+
+    private string GenerateXml(List<ClientDto> clients)
+    {
+        var xmlSerializer = new XmlSerializer(typeof(List<ClientDto>));
+        using var stringWriter = new StringWriter();
+        xmlSerializer.Serialize(stringWriter, clients);
+        return stringWriter.ToString();
+    }
+
+    private async Task SaveAsFile(string filename, string data)
+    {
+        await JsInterop.InvokeVoidAsync("saveAsFile", filename, data);
     }
 }

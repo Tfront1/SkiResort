@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{A2
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkiResort.Frontend.Infrastructure", "src\Frontend\SkiResort.Frontend.Infrastructure\SkiResort.Frontend.Infrastructure.csproj", "{EFC4F378-6121-4570-8568-436A85FE2622}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkiResort.Frontend.Presentation", "src\Frontend\SkiResort.Frontend.Presentation\SkiResort.Frontend.Presentation.csproj", "{06514BB6-EAAF-49CB-96E8-3836BA57C39F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkiResort.Frontend.Presentation", "src\Frontend\SkiResort.Frontend.Presentation\SkiResort.Frontend.Presentation.csproj", "{06514BB6-EAAF-49CB-96E8-3836BA57C39F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

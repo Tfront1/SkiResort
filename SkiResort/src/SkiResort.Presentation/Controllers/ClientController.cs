@@ -36,23 +36,19 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(ClientDto updateDeleteClientDto)
+        public async Task Delete(ClientDto updateDeleteClientDto)
         {
             var client = updateDeleteClientDto.Adapt<Client>();
 
             await repository.Delete(client);
-            
-            return NoContent();
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(ClientDto updateDeleteClientDto)
+        public async Task Update(ClientDto updateDeleteClientDto)
         {
             var client = updateDeleteClientDto.Adapt<Client>();
 
             var updatedClient = (await repository.Update(client)).Adapt<ClientDto>();
-
-            return Ok(updatedClient);
         }
 
         [HttpGet("ClientGetById")]

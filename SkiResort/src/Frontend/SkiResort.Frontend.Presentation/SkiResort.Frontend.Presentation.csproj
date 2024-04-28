@@ -10,4 +10,8 @@
     <ProjectReference Include="..\SkiResort.Frontend.Infrastructure\SkiResort.Frontend.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\Modals\" />
+  </ItemGroup>
+
 </Project>
