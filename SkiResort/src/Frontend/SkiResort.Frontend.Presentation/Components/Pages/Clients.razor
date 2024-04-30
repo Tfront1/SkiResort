@@ -5,6 +5,7 @@
 @using System.Text
 @inject IHttpApiClientFactory HttpApiClientFactory
 @inject IJSRuntime JsInterop
+@inject NavigationManager NavigationManager
 
 <h3>Clients</h3>
 
@@ -19,12 +20,12 @@ else
         <button class="btn btn-success" style="margin-left: 3px;" @onclick="ExportAsCsv">CSV</button>
         <button class="btn btn-info" style="margin-left: 3px;" @onclick="ExportAsXml">XML</button>
         <button class="btn btn-warning" style="margin-left: 3px;" @onclick="ExportAsJson">JSON</button>
+        <button class="btn btn-success" style="margin-left: 100px;" @onclick="() => CreateClient()">Create</button>
     </div>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Phone</th>
@@ -36,12 +37,12 @@ else
             @foreach (var client in clients)
             {
                 <tr>
-                    <td>@client.Id</td>
                     <td>@client.FirstName</td>
                     <td>@client.LastName</td>
                     <td>@client.Phone</td>
                     <td>@client.Email</td>
                     <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => UpdateClient(client)">Update</button>
                         <button class="btn btn-danger btn-sm" @onclick="() => DeleteClient(client)">Delete</button>
                     </td>
                 </tr>
@@ -108,6 +109,11 @@ else
         return (await skiResortApiClient!.ClientGetPaginatedSortedAsync(req)).ToList();
     }
 
+    private async Task UpdateClient(ClientDto client)
+    {
+        NavigationManager.NavigateTo($"/client-update/{client.Id}", true);
+    }
+
     private async Task DeleteClient(ClientDto client)
     {
         var confirmed = await JsInterop.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {client.FirstName} {client.LastName}?");
@@ -116,6 +122,11 @@ else
             await skiResortApiClient.ClientDELETEAsync(client);
             clients.Remove(client);
         }
+    }
+
+    private async Task CreateClient()
+    {
+        NavigationManager.NavigateTo("/add-client", true);
     }
 
     private async Task LoadNext()

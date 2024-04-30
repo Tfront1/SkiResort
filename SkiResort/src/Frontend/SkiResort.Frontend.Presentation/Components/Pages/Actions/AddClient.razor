@@ -1,0 +1,44 @@
+﻿@page "/add-client"
+@using System.Net.Http.Json
+@inject NavigationManager NavigationManager
+@inject IHttpApiClientFactory HttpApiClientFactory
+
+<h3>Add New Client</h3>
+
+
+    <div class="mb-3">
+        <label for="firstName" class="form-label">First Name</label>
+        <InputText id="firstName" class="form-control" @bind-Value="client.FirstName" />
+    </div>
+    <div class="mb-3">
+        <label for="lastName" class="form-label">Last Name</label>
+        <InputText id="lastName" class="form-control" @bind-Value="client.LastName" />
+    </div>
+    <div class="mb-3">
+        <label for="phone" class="form-label">Phone</label>
+        <InputText id="phone" class="form-control" @bind-Value="client.Phone" />
+    </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="client.Email" />
+    </div>
+
+    <button type="submit" class="btn btn-primary" @onclick="() => HandleSubmit()">Add Client</button>
+
+
+@code {
+    private SkiResortApiClient? skiResortApiClient;
+
+    private CreateClientDto client = new CreateClientDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
+    }
+
+    private async Task HandleSubmit()
+    {
+        await skiResortApiClient!.ClientPOSTAsync(client);
+        NavigationManager.NavigateTo("/clients", true);
+    }
+}

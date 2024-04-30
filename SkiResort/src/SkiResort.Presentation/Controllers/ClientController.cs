@@ -24,15 +24,11 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateClientDto createClientDto)
+        public async Task Create(CreateClientDto createClientDto)
         {
             var client = createClientDto.Adapt<Client>();
 
             var newClient = (await repository.Create(client)).Adapt<CreateClientDto>();
-
-            return Created(
-                nameof(newClient),
-                newClient);
         }
 
         [HttpDelete]
@@ -52,31 +48,21 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpGet("ClientGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ClientDto> GetById(int id)
         {
             var client = (await repository.GetById(id)).Adapt<ClientDto>();
 
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return client;
         }
 
         [HttpGet("ClientGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<ClientDto>> GetAll()
         {
             var clients = (await repository.GetAll()).AsQueryable();
 
             var clientDtos = clients.ProjectToType<ClientDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
-
-            return Ok(clientDtos);
+            return clientDtos.ToList();
         }
 
         [HttpPost("ClientGetPaginatedSorted")]
