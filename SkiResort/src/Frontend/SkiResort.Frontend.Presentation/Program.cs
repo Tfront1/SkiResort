@@ -1,4 +1,5 @@
 using SkiResort.Frontend.Presentation.Components;
+using SkiResort.Frontend.Presentation.Services;
 
 namespace SkiResort.Frontend.Presentation
 {
@@ -12,6 +13,7 @@ namespace SkiResort.Frontend.Presentation
                 .AddInteractiveServerComponents();
 
             builder.Services.AddScoped<IHttpApiClientFactory, HttpApiClientFactory>();
+            builder.Services.AddScoped<SessionStorageAccessor>();
 
             var app = builder.Build();
 

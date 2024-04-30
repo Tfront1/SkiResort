@@ -1,24 +1,58 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">SkiResort</a>
+﻿@using SkiResort.Frontend.Presentation.Services
+@inject NavigationManager NavigationManager
+@inject SessionStorageAccessor _sessionStorage;
+
+
+@if (name is not null)
+{
+    <div class="top-row ps-3 navbar navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="">SkiResort</a>
+        </div>
     </div>
-</div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+    <input type="checkbox" title="Navigation menu" class="navbar-toggler" />
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
+    <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                </NavLink>
+            </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="clients">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Clients
-            </NavLink>
-        </div>
-    </nav>
-</div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="clients">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Clients
+                </NavLink>
+            </div>
+        </nav>
+    </div>
+}
 
+
+@code {
+    public string name = default;
+    public string role = default;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            name = await _sessionStorage.GetValueAsync<string?>("name");
+            role = await _sessionStorage.GetValueAsync<string?>("role");
+        }
+        catch (Exception ex) { };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        name = await _sessionStorage.GetValueAsync<string?>("name");
+        role = await _sessionStorage.GetValueAsync<string?>("role");
+
+        if (role is null)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+}
