@@ -1,4 +1,4 @@
-﻿@page "/slopes"
+﻿@page "/databaseLogs"
 @using System.Net.Http.Json
 @using System.Text.Json
 @using System.Xml.Serialization
@@ -9,9 +9,9 @@
 @inject NavigationManager NavigationManager
 @inject SessionStorageAccessor _sessionStorage;
 
-<h3>Slopes</h3>
+<h3>DatabaseLogs</h3>
 
-@if (slopes == null)
+@if (databaseLogs == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -27,22 +27,18 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th @onclick="() => ApplySorting(nameof(SlopeDto.Name))">Name</th>
-                <th @onclick="() => ApplySorting(nameof(SlopeDto.DifficultyLevel))">Difficulty Level</th>
-                <th @onclick="() => ApplySorting(nameof(SlopeDto.Status))">Status</th>
-                <th>Actions</th>
+                <th @onclick="() => ApplySorting(nameof(DatabaseLogModel.Id))">Id</th>
+                <th @onclick="() => ApplySorting(nameof(DatabaseLogModel.EventDate))">Event Date</th>
+                <th @onclick="() => ApplySorting(nameof(DatabaseLogModel.TableName))">Table Name</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var slope in slopes)
+            @foreach (var databaseLog in databaseLogs)
             {
                 <tr>
-                    <td>@slope.Name</td>
-                    <td>@slope.DifficultyLevel</td>
-                    <td>@slope.Status</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteSlope(slope)">Delete</button>
-                    </td>
+                    <td>@databaseLog.Id</td>
+                    <td>@databaseLog.EventDate</td>
+                    <td>@databaseLog.TableName</td>
                 </tr>
             }
         </tbody>
@@ -64,7 +60,7 @@ else
     }
     else
     {
-        @if (slopes.Count() == req.PageSize)
+        @if (databaseLogs.Count() == req.PageSize)
         {
             <div class="d-flex justify-content-center align-items-center mt-3">
                 <button class="btn btn-primary btn-lg m-2" @onclick="LoadPrevious">
@@ -83,9 +79,8 @@ else
 
 @code {
     private SkiResortApiClient? skiResortApiClient;
-    private SlopeDto selectedSlope = new SlopeDto();
-    private List<SlopeDto>? slopes;
-    private int seedDataCount;
+    private DatabaseLogModel selectedDatabaseLog = new DatabaseLogModel();
+    private List<DatabaseLogModel>? databaseLogs;
     public string name = default;
     public string role = default;
 
@@ -93,7 +88,7 @@ else
         {
             PageIndex = 1,
             PageSize = 10,
-            SortBy = nameof(SlopeDto.Id),
+            SortBy = nameof(DatabaseLogModel.Id),
             Ascending = true,
             Filter = "",
         };
@@ -107,75 +102,24 @@ else
         }
         catch (Exception ex) { };
         skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
-        slopes = await LoadData(req);
+        databaseLogs = await LoadData(req);
     }
 
-    private async Task<List<SlopeDto>> LoadData(PaginationSortingRequest req)
+    private async Task<List<DatabaseLogModel>> LoadData(PaginationSortingRequest req)
     {
-        return (await skiResortApiClient!.SlopeGetPaginatedSortedAsync(req)).ToList();
+        return (await skiResortApiClient!.DatabaseLogGetPaginatedSortedAsync(req)).ToList();
     }
-
-    private async Task UpdateSlope(SlopeDto slope)
-    {
-        NavigationManager.NavigateTo($"/slope-update/{slope.Id}", true);
-    }
-
-    private async Task DeleteSlope(SlopeDto slope)
-    {
-        var confirmed = await JsInterop.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {slope.Name}");
-        if (confirmed)
-        {
-            await skiResortApiClient.SlopeDELETEAsync(slope);
-            slopes.Remove(slope);
-        }
-    }
-
-    private async Task CreateSlope()
-    {
-        NavigationManager.NavigateTo("/add-slope", true);
-    }
-
-    private async Task ImportJson()
-    {
-        var jsonData = await JsInterop.InvokeAsync<string>("uploadFile");
-        if (!string.IsNullOrEmpty(jsonData))
-        {
-            var newSlopes = JsonSerializer.Deserialize<List<SlopeDto>>(jsonData);
-            if (newSlopes != null)
-            {
-                foreach (var slope in newSlopes)
-                {
-                    await CreateSlopeFromJson(slope);
-                }
-                slopes = await LoadData(req);
-            }
-        }
-        NavigationManager.NavigateTo("/slopes", true);
-    }
-
-    private async Task CreateSlopeFromJson(SlopeDto slope)
-    {
-        var slopeDto = new CreateSlopeDto()
-            {
-                Name = slope.Name,
-                DifficultyLevel = slope.DifficultyLevel,
-                Status = slope.Status,
-            };
-
-        await skiResortApiClient!.SlopePOSTAsync(slopeDto);
-    }
-
 
     private async Task LoadNext()
     {
         PaginationSortingRequest reqTemp = new PaginationSortingRequest
-        {
-            PageIndex = req.PageIndex + 1,
-            PageSize = req.PageSize,
-            SortBy = req.SortBy,
-            Ascending = req.Ascending,
-            Filter = req.Filter,
-        };
+            {
+                PageIndex = req.PageIndex + 1,
+                PageSize = req.PageSize,
+                SortBy = req.SortBy,
+                Ascending = req.Ascending,
+                Filter = req.Filter,
+            };
 
         var res = await LoadData(reqTemp);
 
@@ -185,7 +129,7 @@ else
         }
 
         req.PageIndex++;
-        slopes = res;
+        databaseLogs = res;
     }
 
     private async Task LoadPrevious()
@@ -193,7 +137,7 @@ else
         if (req.PageIndex > 1)
         {
             req.PageIndex--;
-            slopes = await LoadData(req);
+            databaseLogs = await LoadData(req);
         }
     }
 
@@ -209,51 +153,51 @@ else
             req.Ascending = true;
         }
 
-        slopes = await LoadData(req);
+        databaseLogs = await LoadData(req);
     }
 
     private async Task ApplyFilter(KeyboardEventArgs args)
     {
         req.PageIndex = 1;
-        slopes = await LoadData(req);
+        databaseLogs = await LoadData(req);
     }
 
     private async Task ExportAsCsv()
     {
-        var csvData = GenerateCsv(slopes);
-        await SaveAsFile("slopes.csv", csvData);
+        var csvData = GenerateCsv(databaseLogs);
+        await SaveAsFile("databaseLogs.csv", csvData);
     }
 
     private async Task ExportAsXml()
     {
-        var xmlData = GenerateXml(slopes);
-        await SaveAsFile("slopes.xml", xmlData);
+        var xmlData = GenerateXml(databaseLogs);
+        await SaveAsFile("databaseLogs.xml", xmlData);
     }
 
     private async Task ExportAsJson()
     {
-        var jsonData = JsonSerializer.Serialize(slopes);
-        await SaveAsFile("slopes.json", jsonData);
+        var jsonData = JsonSerializer.Serialize(databaseLogs);
+        await SaveAsFile("databaseLogs.json", jsonData);
     }
 
-    private string GenerateCsv(List<SlopeDto> slopes)
+    private string GenerateCsv(List<DatabaseLogModel> databaseLogs)
     {
         var stringBuilder = new StringBuilder();
-        stringBuilder.AppendLine("Id,Name,DifficultyLevel,Status");
+        stringBuilder.AppendLine("Id,EventDate,TableName");
 
-        foreach (var slope in slopes)
+        foreach (var databaseLog in databaseLogs)
         {
-            stringBuilder.AppendLine($"{slope.Id},{slope.Name},{slope.DifficultyLevel},{slope.Status}");
+            stringBuilder.AppendLine($"{databaseLog.Id},{databaseLog.EventDate},{databaseLog.TableName}");
         }
 
         return stringBuilder.ToString();
     }
 
-    private string GenerateXml(List<SlopeDto> slopes)
+    private string GenerateXml(List<DatabaseLogModel> databaseLogs)
     {
-        var xmlSerializer = new XmlSerializer(typeof(List<SlopeDto>));
+        var xmlSerializer = new XmlSerializer(typeof(List<DatabaseLogModel>));
         using var stringWriter = new StringWriter();
-        xmlSerializer.Serialize(stringWriter, slopes);
+        xmlSerializer.Serialize(stringWriter, databaseLogs);
         return stringWriter.ToString();
     }
 

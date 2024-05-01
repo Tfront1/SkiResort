@@ -30,6 +30,7 @@ public class SkiResortInternalContext : DbContext
     public DbSet<Role> Roles { get; set; }
     public DbSet<ClientEventCountModel> ClientEventCounts { get; set; }
     public DbSet<InstructorLessonCountModel> InstructorLessonCounts { get; set; }
+    public DbSet<DatabaseLogModel> DatabaseLogModels { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -53,6 +54,7 @@ public class SkiResortInternalContext : DbContext
         modelBuilder.ApplyConfiguration(new Configurations.RoleConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.ClientEventCountsConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.InstructorLessonCountsConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.DatabaseLogModelsConfiguration());
 
         modelBuilder.ConvertToSnakeCase();
     }

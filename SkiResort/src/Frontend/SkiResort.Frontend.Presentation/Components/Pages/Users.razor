@@ -239,7 +239,7 @@ else
     private string GenerateCsv(List<UserDto> users)
     {
         var stringBuilder = new StringBuilder();
-        stringBuilder.AppendLine("Id,FirstName,LastName,Phone,Email");
+        stringBuilder.AppendLine("Id,Username,Email,RoleId");
 
         foreach (var user in users)
         {

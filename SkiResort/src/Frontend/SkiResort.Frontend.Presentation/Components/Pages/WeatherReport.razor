@@ -239,7 +239,7 @@ else
     private string GenerateCsv(List<WeatherReportDto> weatherReports)
     {
         var stringBuilder = new StringBuilder();
-        stringBuilder.AppendLine("Id,FirstName,LastName,Phone,Email");
+        stringBuilder.AppendLine("Id,Date,WeatherCondition,Temperature");
 
         foreach (var weatherReport in weatherReports)
         {

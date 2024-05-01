@@ -121,6 +121,30 @@ namespace SkiResort.Infrastructure.Migrations
                     b.ToView("client_events_count", (string)null);
                 });
 
+            modelBuilder.Entity("SkiResort.Domain.dbo.DatabaseLogModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("EventDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("event_date");
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("table_name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_database_logs");
+
+                    b.ToTable("database_logs", (string)null);
+                });
+
             modelBuilder.Entity("SkiResort.Domain.dbo.Equipment", b =>
                 {
                     b.Property<int>("Id")

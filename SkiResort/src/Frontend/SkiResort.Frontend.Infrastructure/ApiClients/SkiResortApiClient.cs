@@ -1168,15 +1168,15 @@ namespace SkiResortApiClient
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ClientEventCountModel>> ClientEventCountGetPaginatedSortedAsync(int? pageIndex, int? pageSize, string sortBy, bool? ascending, string filter)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<DatabaseLogModel>> DatabaseLogGetPaginatedSortedAsync(PaginationSortingRequest body)
         {
-            return ClientEventCountGetPaginatedSortedAsync(pageIndex, pageSize, sortBy, ascending, filter, System.Threading.CancellationToken.None);
+            return DatabaseLogGetPaginatedSortedAsync(body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ClientEventCountModel>> ClientEventCountGetPaginatedSortedAsync(int? pageIndex, int? pageSize, string sortBy, bool? ascending, string filter, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<DatabaseLogModel>> DatabaseLogGetPaginatedSortedAsync(PaginationSortingRequest body, System.Threading.CancellationToken cancellationToken)
         {
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1184,36 +1184,17 @@ namespace SkiResortApiClient
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "text/plain");
+                    var json_ = Newtonsoft.Json.JsonConvert.SerializeObject(body, _settings.Value);
+                    var content_ = new System.Net.Http.StringContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("text/plain"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "ClientEventCountGetPaginatedSorted"
-                    urlBuilder_.Append("ClientEventCountGetPaginatedSorted");
-                    urlBuilder_.Append('?');
-                    if (pageIndex != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("PageIndex")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(pageIndex, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (pageSize != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("PageSize")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(pageSize, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (sortBy != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("SortBy")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(sortBy, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (ascending != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("Ascending")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(ascending, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    if (filter != null)
-                    {
-                        urlBuilder_.Append(System.Uri.EscapeDataString("Filter")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(filter, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
-                    }
-                    urlBuilder_.Length--;
+                    // Operation Path: "api/DatabaseLog/DatabaseLogGetPaginatedSorted"
+                    urlBuilder_.Append("api/DatabaseLog/DatabaseLogGetPaginatedSorted");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -1240,7 +1221,7 @@ namespace SkiResortApiClient
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<ClientEventCountModel>>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<DatabaseLogModel>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
@@ -9506,6 +9487,20 @@ namespace SkiResortApiClient
 
         [Newtonsoft.Json.JsonProperty("temperature", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int Temperature { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.7.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class DatabaseLogModel
+    {
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public int Id { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("eventDate", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTimeOffset EventDate { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("tableName", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string TableName { get; set; }
 
     }
 

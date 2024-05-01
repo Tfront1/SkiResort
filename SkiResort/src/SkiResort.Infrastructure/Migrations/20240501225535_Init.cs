@@ -42,6 +42,20 @@ namespace SkiResort.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "database_logs",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    event_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    table_name = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_database_logs", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "equipments",
                 columns: table => new
                 {
@@ -425,6 +439,9 @@ namespace SkiResort.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "client_event_counts");
+
+            migrationBuilder.DropTable(
+                name: "database_logs");
 
             migrationBuilder.DropTable(
                 name: "equipment_rentals");

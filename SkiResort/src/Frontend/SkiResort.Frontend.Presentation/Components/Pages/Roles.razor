@@ -235,7 +235,7 @@ else
     private string GenerateCsv(List<RoleDto> roles)
     {
         var stringBuilder = new StringBuilder();
-        stringBuilder.AppendLine("Id,FirstName,LastName,Phone,Email");
+        stringBuilder.AppendLine("Id,RoleName");
 
         foreach (var role in roles)
         {
