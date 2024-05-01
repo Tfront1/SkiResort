@@ -3,9 +3,11 @@
 @using System.Text.Json
 @using System.Xml.Serialization
 @using System.Text
+@using SkiResort.Frontend.Presentation.Services
 @inject IHttpApiClientFactory HttpApiClientFactory
 @inject IJSRuntime JsInterop
 @inject NavigationManager NavigationManager
+@inject SessionStorageAccessor _sessionStorage;
 
 <h3>Clients</h3>
 
@@ -20,8 +22,13 @@ else
         <button class="btn btn-success" style="margin-left: 3px;" @onclick="ExportAsCsv">CSV</button>
         <button class="btn btn-info" style="margin-left: 3px;" @onclick="ExportAsXml">XML</button>
         <button class="btn btn-warning" style="margin-left: 3px;" @onclick="ExportAsJson">JSON</button>
-        <button class="btn btn-success" style="margin-left: 100px;" @onclick="() => CreateClient()">Create</button>
-        <button class="btn btn-secondary" style="margin-left: 3px;" @onclick="ImportJson">Import JSON</button>
+        @if (role == "admin")
+        {
+            <button class="btn btn-success" style="margin-left: 100px;" @onclick="() => CreateClient()">Create</button>
+            <button class="btn btn-info" style="margin-left: 3px;" @onclick="ImportJson">Import JSON</button>
+            <button class="btn btn-warning" style="margin-left: 3px;" @onclick="() => SeedData()">Seed</button>
+            <input type="text" style="width:100px" placeholder="Count..." @bind="seedDataCount" />
+        }
     </div>
 
     <table class="table">
@@ -88,7 +95,9 @@ else
     private SkiResortApiClient? skiResortApiClient;
     private ClientDto selectedClient = new ClientDto();
     private List<ClientDto>? clients;
-
+    private int seedDataCount;
+    public string name = default;
+    public string role = default;
 
     private PaginationSortingRequest req = new PaginationSortingRequest
         {
@@ -101,6 +110,12 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            name = await _sessionStorage.GetValueAsync<string?>("name");
+            role = await _sessionStorage.GetValueAsync<string?>("role");
+        }
+        catch (Exception ex) { };
         skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
         clients = await LoadData(req);
     }
@@ -158,6 +173,12 @@ else
             };
 
         await skiResortApiClient!.ClientPOSTAsync(clientDto);
+    }
+
+    private async Task SeedData()
+    {
+        await skiResortApiClient!.ClientSeedAsync(seedDataCount);
+        NavigationManager.NavigateTo("/clients", true);
     }
 
     private async Task LoadNext()

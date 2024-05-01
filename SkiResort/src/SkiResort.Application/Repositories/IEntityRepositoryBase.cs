@@ -14,6 +14,7 @@ public interface IEntityRepositoryBase<TKey, TEntity>
     Task<TEntity> Update(TEntity entity);
     Task Delete(TEntity entity);
     Task<TEntity> Create(TEntity entity);
+    Task BulkCreate(IEnumerable<TEntity> entities);
     Task<IEnumerable<TEntity>> GetAll();
     Task<TEntity> GetById(TKey id);
 }

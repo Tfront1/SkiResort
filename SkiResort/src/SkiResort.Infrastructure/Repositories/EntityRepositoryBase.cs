@@ -27,6 +27,14 @@ public class EntityRepositoryBase<TKey, TEntity> : IEntityRepositoryBase<TKey, T
         return await Task.FromResult(entity).ConfigureAwait(false);
     }
 
+    public async Task BulkCreate(IEnumerable<TEntity> entities)
+    {
+        if (entities == null) throw new ArgumentNullException(nameof(entities));
+
+        await dbSet.AddRangeAsync(entities);
+        await context.SaveChangesAsync().ConfigureAwait(false);
+    }
+
     public virtual async Task Delete(TEntity entity)
     {
         context.Entry(entity).State = EntityState.Deleted;
