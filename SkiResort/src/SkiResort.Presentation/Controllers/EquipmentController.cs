@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Equipment;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -20,63 +22,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateEquipmentDto createEquipmentDto)
+        public async Task Create(CreateEquipmentDto req)
         {
-            var client = createEquipmentDto.Adapt<Equipment>();
+            var dto = req.Adapt<Equipment>();
 
-            var newEquipment = (await repository.Create(client)).Adapt<CreateEquipmentDto>();
-
-            return Created(
-                nameof(newEquipment),
-                newEquipment);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(EquipmentDto updateDeleteEquipmentDto)
+        public async Task Delete(EquipmentDto req)
         {
-            var client = updateDeleteEquipmentDto.Adapt<Equipment>();
+            var dto = req.Adapt<Equipment>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(EquipmentDto updateDeleteEquipmentDto)
+        public async Task Update(EquipmentDto req)
         {
-            var client = updateDeleteEquipmentDto.Adapt<Equipment>();
+            var dto = req.Adapt<Equipment>();
 
-            var updatedEquipment = (await repository.Update(client)).Adapt<EquipmentDto>();
-
-            return Ok(updatedEquipment);
+            await repository.Update(dto);
         }
 
         [HttpGet("EquipmentGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<EquipmentDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<EquipmentDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<EquipmentDto>();
         }
 
         [HttpGet("EquipmentGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<EquipmentDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<EquipmentDto>();
+            var queryDtos = query.ProjectToType<EquipmentDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("EquipmentGetPaginatedSorted")]
+        public async Task<List<EquipmentDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<EquipmentDto>().ToList();
         }
     }
 }

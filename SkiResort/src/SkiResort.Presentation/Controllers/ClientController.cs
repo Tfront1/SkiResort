@@ -24,45 +24,43 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task Create(CreateClientDto createClientDto)
+        public async Task Create(CreateClientDto req)
         {
-            var client = createClientDto.Adapt<Client>();
+            var dto = req.Adapt<Client>();
 
-            var newClient = (await repository.Create(client)).Adapt<CreateClientDto>();
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task Delete(ClientDto updateDeleteClientDto)
+        public async Task Delete(ClientDto req)
         {
-            var client = updateDeleteClientDto.Adapt<Client>();
+            var dto = req.Adapt<Client>();
 
-            await repository.Delete(client);
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task Update(ClientDto updateDeleteClientDto)
+        public async Task Update(ClientDto req)
         {
-            var client = updateDeleteClientDto.Adapt<Client>();
+            var dto = req.Adapt<Client>();
 
-            var updatedClient = (await repository.Update(client)).Adapt<ClientDto>();
+            await repository.Update(dto);
         }
 
         [HttpGet("ClientGetById")]
         public async Task<ClientDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<ClientDto>();
-
-            return client;
+            return (await repository.GetById(id)).Adapt<ClientDto>();
         }
 
         [HttpGet("ClientGetAll")]
         public async Task<List<ClientDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<ClientDto>();
+            var queryDtos = query.ProjectToType<ClientDto>();
 
-            return clientDtos.ToList();
+            return queryDtos.ToList();
         }
 
         [HttpPost("ClientGetPaginatedSorted")]

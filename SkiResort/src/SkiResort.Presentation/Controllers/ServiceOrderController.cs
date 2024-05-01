@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.ServiceOrder;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -20,63 +22,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateServiceOrderDto createServiceOrderDto)
+        public async Task Create(CreateServiceOrderDto req)
         {
-            var client = createServiceOrderDto.Adapt<ServiceOrder>();
+            var dto = req.Adapt<ServiceOrder>();
 
-            var newServiceOrder = (await repository.Create(client)).Adapt<CreateServiceOrderDto>();
-
-            return Created(
-                nameof(newServiceOrder),
-                newServiceOrder);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(ServiceOrderDto updateDeleteServiceOrderDto)
+        public async Task Delete(ServiceOrderDto req)
         {
-            var client = updateDeleteServiceOrderDto.Adapt<ServiceOrder>();
+            var dto = req.Adapt<ServiceOrder>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(ServiceOrderDto updateDeleteServiceOrderDto)
+        public async Task Update(ServiceOrderDto req)
         {
-            var client = updateDeleteServiceOrderDto.Adapt<ServiceOrder>();
+            var dto = req.Adapt<ServiceOrder>();
 
-            var updatedServiceOrder = (await repository.Update(client)).Adapt<ServiceOrderDto>();
-
-            return Ok(updatedServiceOrder);
+            await repository.Update(dto);
         }
 
         [HttpGet("ServiceOrderGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ServiceOrderDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<ServiceOrderDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<ServiceOrderDto>();
         }
 
         [HttpGet("ServiceOrderGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<ServiceOrderDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<ServiceOrderDto>();
+            var queryDtos = query.ProjectToType<ServiceOrderDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("ServiceOrderGetPaginatedSorted")]
+        public async Task<List<ServiceOrderDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<ServiceOrderDto>().ToList();
         }
     }
 }

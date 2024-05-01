@@ -1,8 +1,10 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Booking;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -19,63 +21,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateBookingDto createBookingDto)
+        public async Task Create(CreateBookingDto req)
         {
-            var client = createBookingDto.Adapt<Booking>();
+            var dto = req.Adapt<Booking>();
 
-            var newBooking = (await repository.Create(client)).Adapt<CreateBookingDto>();
-
-            return Created(
-                nameof(newBooking),
-                newBooking);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(BookingDto updateDeleteBookingDto)
+        public async Task Delete(BookingDto req)
         {
-            var client = updateDeleteBookingDto.Adapt<Booking>();
+            var dto = req.Adapt<Booking>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(BookingDto updateDeleteBookingDto)
+        public async Task Update(BookingDto req)
         {
-            var client = updateDeleteBookingDto.Adapt<Booking>();
+            var dto = req.Adapt<Booking>();
 
-            var updatedBooking = (await repository.Update(client)).Adapt<BookingDto>();
-
-            return Ok(updatedBooking);
+            await repository.Update(dto);
         }
 
         [HttpGet("BookingGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<BookingDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<BookingDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<BookingDto>();
         }
 
         [HttpGet("BookingGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<BookingDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<BookingDto>();
+            var queryDtos = query.ProjectToType<BookingDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("BookingGetPaginatedSorted")]
+        public async Task<List<BookingDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<BookingDto>().ToList();
         }
     }
 }

@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Service;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -20,63 +22,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateServiceDto createServiceDto)
+        public async Task Create(CreateServiceDto req)
         {
-            var client = createServiceDto.Adapt<Service>();
+            var dto = req.Adapt<Service>();
 
-            var newService = (await repository.Create(client)).Adapt<CreateServiceDto>();
-
-            return Created(
-                nameof(newService),
-                newService);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(ServiceDto updateDeleteServiceDto)
+        public async Task Delete(ServiceDto req)
         {
-            var client = updateDeleteServiceDto.Adapt<Service>();
+            var dto = req.Adapt<Service>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(ServiceDto updateDeleteServiceDto)
+        public async Task Update(ServiceDto req)
         {
-            var client = updateDeleteServiceDto.Adapt<Service>();
+            var dto = req.Adapt<Service>();
 
-            var updatedService = (await repository.Update(client)).Adapt<ServiceDto>();
-
-            return Ok(updatedService);
+            await repository.Update(dto);
         }
 
         [HttpGet("ServiceGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ServiceDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<ServiceDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<ServiceDto>();
         }
 
         [HttpGet("ServiceGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<ServiceDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<ServiceDto>();
+            var queryDtos = query.ProjectToType<ServiceDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("ServiceGetPaginatedSorted")]
+        public async Task<List<ServiceDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<ServiceDto>().ToList();
         }
     }
 }

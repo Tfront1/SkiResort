@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Instructor;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -20,63 +22,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateInstructorDto createInstructorDto)
+        public async Task Create(CreateInstructorDto req)
         {
-            var client = createInstructorDto.Adapt<Instructor>();
+            var dto = req.Adapt<Instructor>();
 
-            var newInstructor = (await repository.Create(client)).Adapt<CreateInstructorDto>();
-
-            return Created(
-                nameof(newInstructor),
-                newInstructor);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(InstructorDto updateDeleteInstructorDto)
+        public async Task Delete(InstructorDto req)
         {
-            var client = updateDeleteInstructorDto.Adapt<Instructor>();
+            var dto = req.Adapt<Instructor>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(InstructorDto updateDeleteInstructorDto)
+        public async Task Update(InstructorDto req)
         {
-            var client = updateDeleteInstructorDto.Adapt<Instructor>();
+            var dto = req.Adapt<Instructor>();
 
-            var updatedInstructor = (await repository.Update(client)).Adapt<InstructorDto>();
-
-            return Ok(updatedInstructor);
+            await repository.Update(dto);
         }
 
         [HttpGet("InstructorGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<InstructorDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<InstructorDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<InstructorDto>();
         }
 
         [HttpGet("InstructorGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<InstructorDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<InstructorDto>();
+            var queryDtos = query.ProjectToType<InstructorDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("InstructorGetPaginatedSorted")]
+        public async Task<List<InstructorDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<InstructorDto>().ToList();
         }
     }
 }

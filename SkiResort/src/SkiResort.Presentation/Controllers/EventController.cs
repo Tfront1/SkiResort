@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Event;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -20,63 +22,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateEventDto createEventDto)
+        public async Task Create(CreateEventDto req)
         {
-            var client = createEventDto.Adapt<Event>();
+            var dto = req.Adapt<Event>();
 
-            var newEvent = (await repository.Create(client)).Adapt<CreateEventDto>();
-
-            return Created(
-                nameof(newEvent),
-                newEvent);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(EventDto updateDeleteEventDto)
+        public async Task Delete(EventDto req)
         {
-            var client = updateDeleteEventDto.Adapt<Event>();
+            var dto = req.Adapt<Event>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(EventDto updateDeleteEventDto)
+        public async Task Update(EventDto req)
         {
-            var client = updateDeleteEventDto.Adapt<Event>();
+            var dto = req.Adapt<Event>();
 
-            var updatedEvent = (await repository.Update(client)).Adapt<EventDto>();
-
-            return Ok(updatedEvent);
+            await repository.Update(dto);
         }
 
         [HttpGet("EventGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<EventDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<EventDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<EventDto>();
         }
 
         [HttpGet("EventGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<EventDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<EventDto>();
+            var queryDtos = query.ProjectToType<EventDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("EventGetPaginatedSorted")]
+        public async Task<List<EventDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<EventDto>().ToList();
         }
     }
 }

@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.WeatherReport;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -20,63 +22,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateWeatherReportDto createWeatherReportDto)
+        public async Task Create(CreateWeatherReportDto req)
         {
-            var client = createWeatherReportDto.Adapt<WeatherReport>();
+            var dto = req.Adapt<WeatherReport>();
 
-            var newWeatherReport = (await repository.Create(client)).Adapt<CreateWeatherReportDto>();
-
-            return Created(
-                nameof(newWeatherReport),
-                newWeatherReport);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(WeatherReportDto updateDeleteWeatherReportDto)
+        public async Task Delete(WeatherReportDto req)
         {
-            var client = updateDeleteWeatherReportDto.Adapt<WeatherReport>();
+            var dto = req.Adapt<WeatherReport>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(WeatherReportDto updateDeleteWeatherReportDto)
+        public async Task Update(WeatherReportDto req)
         {
-            var client = updateDeleteWeatherReportDto.Adapt<WeatherReport>();
+            var dto = req.Adapt<WeatherReport>();
 
-            var updatedWeatherReport = (await repository.Update(client)).Adapt<WeatherReportDto>();
-
-            return Ok(updatedWeatherReport);
+            await repository.Update(dto);
         }
 
         [HttpGet("WeatherReportGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<WeatherReportDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<WeatherReportDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<WeatherReportDto>();
         }
 
         [HttpGet("WeatherReportGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<WeatherReportDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<WeatherReportDto>();
+            var queryDtos = query.ProjectToType<WeatherReportDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("WeatherReportGetPaginatedSorted")]
+        public async Task<List<WeatherReportDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<WeatherReportDto>().ToList();
         }
     }
 }

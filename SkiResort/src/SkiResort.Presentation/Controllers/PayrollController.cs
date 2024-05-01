@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Payroll;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -20,63 +22,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreatePayrollDto createPayrollDto)
+        public async Task Create(CreatePayrollDto req)
         {
-            var client = createPayrollDto.Adapt<Payroll>();
+            var dto = req.Adapt<Payroll>();
 
-            var newPayroll = (await repository.Create(client)).Adapt<CreatePayrollDto>();
-
-            return Created(
-                nameof(newPayroll),
-                newPayroll);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(PayrollDto updateDeletePayrollDto)
+        public async Task Delete(PayrollDto req)
         {
-            var client = updateDeletePayrollDto.Adapt<Payroll>();
+            var dto = req.Adapt<Payroll>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(PayrollDto updateDeletePayrollDto)
+        public async Task Update(PayrollDto req)
         {
-            var client = updateDeletePayrollDto.Adapt<Payroll>();
+            var dto = req.Adapt<Payroll>();
 
-            var updatedPayroll = (await repository.Update(client)).Adapt<PayrollDto>();
-
-            return Ok(updatedPayroll);
+            await repository.Update(dto);
         }
 
         [HttpGet("PayrollGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<PayrollDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<PayrollDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<PayrollDto>();
         }
 
         [HttpGet("PayrollGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<PayrollDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<PayrollDto>();
+            var queryDtos = query.ProjectToType<PayrollDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("PayrollGetPaginatedSorted")]
+        public async Task<List<PayrollDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<PayrollDto>().ToList();
         }
     }
 }

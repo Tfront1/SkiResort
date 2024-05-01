@@ -1,8 +1,10 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Employee;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -19,63 +21,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateEmployeeDto createEmployeeDto)
+        public async Task Create(CreateEmployeeDto req)
         {
-            var client = createEmployeeDto.Adapt<Employee>();
+            var dto = req.Adapt<Employee>();
 
-            var newEmployee = (await repository.Create(client)).Adapt<CreateEmployeeDto>();
-
-            return Created(
-                nameof(newEmployee),
-                newEmployee);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(EmployeeDto updateDeleteEmployeeDto)
+        public async Task Delete(EmployeeDto req)
         {
-            var client = updateDeleteEmployeeDto.Adapt<Employee>();
+            var dto = req.Adapt<Employee>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(EmployeeDto updateDeleteEmployeeDto)
+        public async Task Update(EmployeeDto req)
         {
-            var client = updateDeleteEmployeeDto.Adapt<Employee>();
+            var dto = req.Adapt<Employee>();
 
-            var updatedEmployee = (await repository.Update(client)).Adapt<EmployeeDto>();
-
-            return Ok(updatedEmployee);
+            await repository.Update(dto);
         }
 
         [HttpGet("EmployeeGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<EmployeeDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<EmployeeDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<EmployeeDto>();
         }
 
         [HttpGet("EmployeeGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<EmployeeDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<EmployeeDto>();
+            var queryDtos = query.ProjectToType<EmployeeDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("EmployeeGetPaginatedSorted")]
+        public async Task<List<EmployeeDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<EmployeeDto>().ToList();
         }
     }
 }

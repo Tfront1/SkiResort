@@ -1,9 +1,17 @@
 ﻿@inherits LayoutComponentBase
+@using SkiResort.Frontend.Presentation.Services
+@inject NavigationManager NavigationManager
+@inject SessionStorageAccessor _sessionStorage;
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+
+    @if (name is not null)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
+    
 
     <main>
         <article class="content px-4">
@@ -17,3 +25,29 @@
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
 </div>
+
+@code {
+    public string name = default;
+    public string role = default;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            name = await _sessionStorage.GetValueAsync<string?>("name");
+            role = await _sessionStorage.GetValueAsync<string?>("role");
+        }
+        catch (Exception ex) { };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        name = await _sessionStorage.GetValueAsync<string?>("name");
+        role = await _sessionStorage.GetValueAsync<string?>("role");
+
+        if (role is null)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+}

@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Role;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -20,63 +22,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateRoleDto createRoleDto)
+        public async Task Create(CreateRoleDto req)
         {
-            var client = createRoleDto.Adapt<Role>();
+            var dto = req.Adapt<Role>();
 
-            var newRole = (await repository.Create(client)).Adapt<CreateRoleDto>();
-
-            return Created(
-                nameof(newRole),
-                newRole);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(RoleDto updateDeleteRoleDto)
+        public async Task Delete(RoleDto req)
         {
-            var client = updateDeleteRoleDto.Adapt<Role>();
+            var dto = req.Adapt<Role>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(RoleDto updateDeleteRoleDto)
+        public async Task Update(RoleDto req)
         {
-            var client = updateDeleteRoleDto.Adapt<Role>();
+            var dto = req.Adapt<Role>();
 
-            var updatedRole = (await repository.Update(client)).Adapt<RoleDto>();
-
-            return Ok(updatedRole);
+            await repository.Update(dto);
         }
 
         [HttpGet("RoleGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<RoleDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<RoleDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<RoleDto>();
         }
 
         [HttpGet("RoleGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<RoleDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<RoleDto>();
+            var queryDtos = query.ProjectToType<RoleDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("RoleGetPaginatedSorted")]
+        public async Task<List<RoleDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<RoleDto>().ToList();
         }
     }
 }

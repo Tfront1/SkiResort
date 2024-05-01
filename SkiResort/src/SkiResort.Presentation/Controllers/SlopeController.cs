@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.Slope;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -20,63 +22,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateSlopeDto createSlopeDto)
+        public async Task Create(CreateSlopeDto req)
         {
-            var client = createSlopeDto.Adapt<Slope>();
+            var dto = req.Adapt<Slope>();
 
-            var newSlope = (await repository.Create(client)).Adapt<CreateSlopeDto>();
-
-            return Created(
-                nameof(newSlope),
-                newSlope);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(SlopeDto updateDeleteSlopeDto)
+        public async Task Delete(SlopeDto req)
         {
-            var client = updateDeleteSlopeDto.Adapt<Slope>();
+            var dto = req.Adapt<Slope>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(SlopeDto updateDeleteSlopeDto)
+        public async Task Update(SlopeDto req)
         {
-            var client = updateDeleteSlopeDto.Adapt<Slope>();
+            var dto = req.Adapt<Slope>();
 
-            var updatedSlope = (await repository.Update(client)).Adapt<SlopeDto>();
-
-            return Ok(updatedSlope);
+            await repository.Update(dto);
         }
 
         [HttpGet("SlopeGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<SlopeDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<SlopeDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<SlopeDto>();
         }
 
         [HttpGet("SlopeGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<SlopeDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<SlopeDto>();
+            var queryDtos = query.ProjectToType<SlopeDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("SlopeGetPaginatedSorted")]
+        public async Task<List<SlopeDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<SlopeDto>().ToList();
         }
     }
 }

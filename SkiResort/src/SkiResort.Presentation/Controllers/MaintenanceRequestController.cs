@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SkiResort.Application.Repositories;
+using SkiResort.Contracts;
 using SkiResort.Contracts.dboContracts.MaintenanceRequest;
 using SkiResort.Domain.dbo;
+using SkiResort.Presentation.Extensions;
 
 namespace SkiResort.Presentation.Controllers
 {
@@ -20,63 +22,57 @@ namespace SkiResort.Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateMaintenanceRequestDto createMaintenanceRequestDto)
+        public async Task Create(CreateMaintenanceRequestDto req)
         {
-            var client = createMaintenanceRequestDto.Adapt<MaintenanceRequest>();
+            var dto = req.Adapt<MaintenanceRequest>();
 
-            var newMaintenanceRequest = (await repository.Create(client)).Adapt<CreateMaintenanceRequestDto>();
-
-            return Created(
-                nameof(newMaintenanceRequest),
-                newMaintenanceRequest);
+            await repository.Create(dto);
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(MaintenanceRequestDto updateDeleteMaintenanceRequestDto)
+        public async Task Delete(MaintenanceRequestDto req)
         {
-            var client = updateDeleteMaintenanceRequestDto.Adapt<MaintenanceRequest>();
+            var dto = req.Adapt<MaintenanceRequest>();
 
-            await repository.Delete(client);
-            
-            return NoContent();
+            await repository.Delete(dto);
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(MaintenanceRequestDto updateDeleteMaintenanceRequestDto)
+        public async Task Update(MaintenanceRequestDto req)
         {
-            var client = updateDeleteMaintenanceRequestDto.Adapt<MaintenanceRequest>();
+            var dto = req.Adapt<MaintenanceRequest>();
 
-            var updatedMaintenanceRequest = (await repository.Update(client)).Adapt<MaintenanceRequestDto>();
-
-            return Ok(updatedMaintenanceRequest);
+            await repository.Update(dto);
         }
 
         [HttpGet("MaintenanceRequestGetById")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<MaintenanceRequestDto> GetById(int id)
         {
-            var client = (await repository.GetById(id)).Adapt<MaintenanceRequestDto>();
-
-            if (client is null)
-            {
-                return NoContent();
-            }
-
-            return Ok(client);
+            return (await repository.GetById(id)).Adapt<MaintenanceRequestDto>();
         }
 
         [HttpGet("MaintenanceRequestGetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<List<MaintenanceRequestDto>> GetAll()
         {
-            var clients = (await repository.GetAll()).AsQueryable();
+            var query = (await repository.GetAll()).AsQueryable();
 
-            var clientDtos = clients.ProjectToType<MaintenanceRequestDto>();
+            var queryDtos = query.ProjectToType<MaintenanceRequestDto>();
 
-            if (clientDtos.Count() == 0)
-            {
-                return NoContent();
-            }
+            return queryDtos.ToList();
+        }
 
-            return Ok(clientDtos);
+        [HttpPost("MaintenanceRequestGetPaginatedSorted")]
+        public async Task<List<MaintenanceRequestDto>> GetPaginated(PaginationSortingRequest paginationSortingRequest)
+        {
+            var query = (await repository.GetAll()).AsQueryable();
+
+            query = query.ApplyFiltering(paginationSortingRequest.Filter);
+
+            query = query.ApplySorting(paginationSortingRequest.SortBy, paginationSortingRequest.Ascending);
+
+            query = query.ApplyPagination(paginationSortingRequest.PageIndex, paginationSortingRequest.PageSize);
+
+            return query.ProjectToType<MaintenanceRequestDto>().ToList();
         }
     }
 }
