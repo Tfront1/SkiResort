@@ -31,6 +31,7 @@ public class SkiResortInternalContext : DbContext
     public DbSet<ClientEventCountModel> ClientEventCounts { get; set; }
     public DbSet<InstructorLessonCountModel> InstructorLessonCounts { get; set; }
     public DbSet<DatabaseLogModel> DatabaseLogModels { get; set; }
+    public DbSet<UserLogModel> UserLogModels { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -55,6 +56,7 @@ public class SkiResortInternalContext : DbContext
         modelBuilder.ApplyConfiguration(new Configurations.ClientEventCountsConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.InstructorLessonCountsConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.DatabaseLogModelsConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.UserLogModelConfiguration());
 
         modelBuilder.ConvertToSnakeCase();
     }

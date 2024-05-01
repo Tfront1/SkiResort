@@ -1,4 +1,4 @@
-﻿@page "/users"
+﻿@page "/userLogs"
 @using System.Net.Http.Json
 @using System.Text.Json
 @using System.Xml.Serialization
@@ -9,9 +9,9 @@
 @inject NavigationManager NavigationManager
 @inject SessionStorageAccessor _sessionStorage;
 
-<h3>Users</h3>
+<h3>UserLogs</h3>
 
-@if (users == null)
+@if (userLogs == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -27,22 +27,18 @@ else
     <table class="table">
         <thead>
             <tr>
-                <th @onclick="() => ApplySorting(nameof(UserDto.Username))">Username</th>
-                <th @onclick="() => ApplySorting(nameof(UserDto.Email))">Email</th>
-                <th @onclick="() => ApplySorting(nameof(UserDto.RoleId))">RoleId</th>
-                <th>Actions</th>
+                <th @onclick="() => ApplySorting(nameof(UserLogModel.Id))">Id</th>
+                <th @onclick="() => ApplySorting(nameof(UserLogModel.UserName))">UserName</th>
+                <th @onclick="() => ApplySorting(nameof(UserLogModel.Page))">Page</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var user in users)
+            @foreach (var userLog in userLogs)
             {
                 <tr>
-                    <td>@user.Username</td>
-                    <td>@user.Email</td>
-                    <td>@user.RoleId</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(user)">Delete</button>
-                    </td>
+                    <td>@userLog.Id</td>
+                    <td>@userLog.UserName</td>
+                    <td>@userLog.Page</td>
                 </tr>
             }
         </tbody>
@@ -64,7 +60,7 @@ else
     }
     else
     {
-        @if (users.Count() == req.PageSize)
+        @if (userLogs.Count() == req.PageSize)
         {
             <div class="d-flex justify-content-center align-items-center mt-3">
                 <button class="btn btn-primary btn-lg m-2" @onclick="LoadPrevious">
@@ -83,9 +79,8 @@ else
 
 @code {
     private SkiResortApiClient? skiResortApiClient;
-    private UserDto selectedUser = new UserDto();
-    private List<UserDto>? users;
-    private int seedDataCount;
+    private UserLogModel selectedUserLog = new UserLogModel();
+    private List<UserLogModel>? userLogs;
     public string name = default;
     public string role = default;
 
@@ -93,7 +88,7 @@ else
         {
             PageIndex = 1,
             PageSize = 10,
-            SortBy = nameof(UserDto.Id),
+            SortBy = nameof(UserLogModel.Id),
             Ascending = true,
             Filter = "",
         };
@@ -105,71 +100,15 @@ else
             name = await _sessionStorage.GetValueAsync<string?>("name");
             role = await _sessionStorage.GetValueAsync<string?>("role");
             skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
-            users = await LoadData(req);
-            await skiResortApiClient.UserLogAsync(new UserLogModel()
-                {
-                    UserName = name,
-                    Page = "/users"
-                });
+            userLogs = await LoadData(req);
         }
         catch (Exception ex) { };
     }
 
-    private async Task<List<UserDto>> LoadData(PaginationSortingRequest req)
+    private async Task<List<UserLogModel>> LoadData(PaginationSortingRequest req)
     {
-        return (await skiResortApiClient!.UserGetPaginatedSortedAsync(req)).ToList();
+        return (await skiResortApiClient!.UserLogGetPaginatedSortedAsync(req)).ToList();
     }
-
-    private async Task UpdateUser(UserDto user)
-    {
-        NavigationManager.NavigateTo($"/user-update/{user.Id}", true);
-    }
-
-    private async Task DeleteUser(UserDto user)
-    {
-        var confirmed = await JsInterop.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {user.Username}");
-        if (confirmed)
-        {
-            await skiResortApiClient.UserDELETEAsync(user);
-            users.Remove(user);
-        }
-    }
-
-    private async Task CreateUser()
-    {
-        NavigationManager.NavigateTo("/add-user", true);
-    }
-
-    private async Task ImportJson()
-    {
-        var jsonData = await JsInterop.InvokeAsync<string>("uploadFile");
-        if (!string.IsNullOrEmpty(jsonData))
-        {
-            var newUsers = JsonSerializer.Deserialize<List<UserDto>>(jsonData);
-            if (newUsers != null)
-            {
-                foreach (var user in newUsers)
-                {
-                    await CreateUserFromJson(user);
-                }
-                users = await LoadData(req);
-            }
-        }
-        NavigationManager.NavigateTo("/users", true);
-    }
-
-    private async Task CreateUserFromJson(UserDto user)
-    {
-        var userDto = new CreateUserDto()
-            {
-                Username = user.Username,
-                Email = user.Email,
-                RoleId = user.RoleId,
-            };
-
-        await skiResortApiClient!.UserPOSTAsync(userDto);
-    }
-
 
     private async Task LoadNext()
     {
@@ -190,7 +129,7 @@ else
         }
 
         req.PageIndex++;
-        users = res;
+        userLogs = res;
     }
 
     private async Task LoadPrevious()
@@ -198,7 +137,7 @@ else
         if (req.PageIndex > 1)
         {
             req.PageIndex--;
-            users = await LoadData(req);
+            userLogs = await LoadData(req);
         }
     }
 
@@ -214,51 +153,51 @@ else
             req.Ascending = true;
         }
 
-        users = await LoadData(req);
+        userLogs = await LoadData(req);
     }
 
     private async Task ApplyFilter(KeyboardEventArgs args)
     {
         req.PageIndex = 1;
-        users = await LoadData(req);
+        userLogs = await LoadData(req);
     }
 
     private async Task ExportAsCsv()
     {
-        var csvData = GenerateCsv(users);
-        await SaveAsFile("users.csv", csvData);
+        var csvData = GenerateCsv(userLogs);
+        await SaveAsFile("userLogs.csv", csvData);
     }
 
     private async Task ExportAsXml()
     {
-        var xmlData = GenerateXml(users);
-        await SaveAsFile("users.xml", xmlData);
+        var xmlData = GenerateXml(userLogs);
+        await SaveAsFile("userLogs.xml", xmlData);
     }
 
     private async Task ExportAsJson()
     {
-        var jsonData = JsonSerializer.Serialize(users);
-        await SaveAsFile("users.json", jsonData);
+        var jsonData = JsonSerializer.Serialize(userLogs);
+        await SaveAsFile("userLogs.json", jsonData);
     }
 
-    private string GenerateCsv(List<UserDto> users)
+    private string GenerateCsv(List<UserLogModel> userLogs)
     {
         var stringBuilder = new StringBuilder();
-        stringBuilder.AppendLine("Id,Username,Email,RoleId");
+        stringBuilder.AppendLine("Id,UserName,Page");
 
-        foreach (var user in users)
+        foreach (var userLog in userLogs)
         {
-            stringBuilder.AppendLine($"{user.Id},{user.Username},{user.Email},{user.RoleId}");
+            stringBuilder.AppendLine($"{userLog.Id},{userLog.UserName},{userLog.Page}");
         }
 
         return stringBuilder.ToString();
     }
 
-    private string GenerateXml(List<UserDto> users)
+    private string GenerateXml(List<UserLogModel> userLogs)
     {
-        var xmlSerializer = new XmlSerializer(typeof(List<UserDto>));
+        var xmlSerializer = new XmlSerializer(typeof(List<UserLogModel>));
         using var stringWriter = new StringWriter();
-        xmlSerializer.Serialize(stringWriter, users);
+        xmlSerializer.Serialize(stringWriter, userLogs);
         return stringWriter.ToString();
     }
 

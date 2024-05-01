@@ -3,19 +3,19 @@ using SkiResort.Infrastructure.Database.Views;
 
 #nullable disable
 
-namespace SkiResort.Infrastructure.Migrations
+namespace SkiResort.Infrastructure.Migrations;
+
+/// <inheritdoc />
+public partial class ViewsTriggers : Migration
 {
     /// <inheritdoc />
-    public partial class ViewsTriggers : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.Sql(ClientEventsCountViewCode.Code);
+        migrationBuilder.Sql(ClientEventsCountViewCode.Code);
 
-            migrationBuilder.Sql(InstructorLessonsCountViewCode.Code);
+        migrationBuilder.Sql(InstructorLessonsCountViewCode.Code);
 
-            migrationBuilder.Sql(@"
+        migrationBuilder.Sql(@"
                 CREATE OR REPLACE FUNCTION log_slopes_activity() RETURNS TRIGGER AS $$
                 BEGIN
                     INSERT INTO database_logs (event_date, table_name)
@@ -40,7 +40,7 @@ namespace SkiResort.Infrastructure.Migrations
                 EXECUTE PROCEDURE log_slopes_activity();
             ");
 
-            migrationBuilder.Sql(@"
+        migrationBuilder.Sql(@"
                 CREATE OR REPLACE FUNCTION log_clients_activity() RETURNS TRIGGER AS $$
                 BEGIN
                     INSERT INTO database_logs (event_date, table_name)
@@ -65,7 +65,7 @@ namespace SkiResort.Infrastructure.Migrations
                 EXECUTE PROCEDURE log_clients_activity();
             ");
 
-            migrationBuilder.Sql(@"
+        migrationBuilder.Sql(@"
                 CREATE OR REPLACE FUNCTION log_weather_reports_activity() RETURNS TRIGGER AS $$
                 BEGIN
                     INSERT INTO database_logs (event_date, table_name)
@@ -89,12 +89,11 @@ namespace SkiResort.Infrastructure.Migrations
                 FOR EACH ROW
                 EXECUTE PROCEDURE log_weather_reports_activity();
             ");
-        }
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
 
-        }
     }
 }

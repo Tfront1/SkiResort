@@ -77,25 +77,5 @@ namespace SkiResort.Presentation.Controllers
 
             return query.ProjectToType<ClientDto>().ToList();
         }
-
-        [HttpPost("ClientSeed")]
-        public async Task Seed(int count)
-        {
-            var queryDto = new List<CreateClientDto>();
-            for (int i = 0; i < count; i++)
-            {
-                queryDto.Add(new CreateClientDto
-                {
-                    FirstName = $"FirstName{i}",
-                    LastName = $"LastName{i}",
-                    Email = $"email{i}@example.com",
-                    Phone = $"123456789{i % 10}"
-                });
-            }
-
-            var query = queryDto.AsQueryable().ProjectToType<Client>().ToList();
-
-            await repository.BulkCreate(query);
-        }
     }
 }

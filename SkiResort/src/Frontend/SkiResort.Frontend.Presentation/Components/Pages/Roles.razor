@@ -102,10 +102,15 @@ else
         {
             name = await _sessionStorage.GetValueAsync<string?>("name");
             role = await _sessionStorage.GetValueAsync<string?>("role");
+            skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
+            roles = await LoadData(req);
+            await skiResortApiClient.UserLogAsync(new UserLogModel()
+                {
+                    UserName = name,
+                    Page = "/roles"
+                });
         }
         catch (Exception ex) { };
-        skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
-        roles = await LoadData(req);
     }
 
     private async Task<List<RoleDto>> LoadData(PaginationSortingRequest req)

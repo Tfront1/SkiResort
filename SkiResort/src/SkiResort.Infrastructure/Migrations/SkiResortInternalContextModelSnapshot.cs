@@ -568,6 +568,31 @@ namespace SkiResort.Infrastructure.Migrations
                     b.ToTable("users");
                 });
 
+            modelBuilder.Entity("SkiResort.Domain.dbo.UserLogModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Page")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("page");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("user_name");
+
+                    b.HasKey("Id")
+                        .HasName("pk_user_logs");
+
+                    b.ToTable("user_logs", (string)null);
+                });
+
             modelBuilder.Entity("SkiResort.Domain.dbo.WeatherReport", b =>
                 {
                     b.Property<int>("Id")

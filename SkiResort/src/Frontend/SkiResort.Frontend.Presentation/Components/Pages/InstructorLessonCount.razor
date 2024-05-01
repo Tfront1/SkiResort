@@ -58,10 +58,15 @@ else
         {
             name = await _sessionStorage.GetValueAsync<string?>("name");
             role = await _sessionStorage.GetValueAsync<string?>("role");
+            skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
+            instructorLessonCounts = await LoadData();
+            await skiResortApiClient.UserLogAsync(new UserLogModel()
+                {
+                    UserName = name,
+                    Page = "/instructorLessonCounts"
+                });
         }
         catch (Exception ex) { };
-        skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
-        instructorLessonCounts = await LoadData();
     }
 
     private async Task<List<InstructorLessonCountModel>> LoadData()
