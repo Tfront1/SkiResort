@@ -2,6 +2,7 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using SkiResort.Application.Repositories;
+using SkiResort.Domain.dbo;
 using SkiResort.Infrastructure.Database;
 using SkiResort.Infrastructure.Repositories;
 

@@ -1,4 +1,4 @@
-﻿@page "/clients"
+﻿@page "/slopes"
 @using System.Net.Http.Json
 @using System.Text.Json
 @using System.Xml.Serialization
@@ -9,9 +9,9 @@
 @inject NavigationManager NavigationManager
 @inject SessionStorageAccessor _sessionStorage;
 
-<h3>Clients</h3>
+<h3>Slopes</h3>
 
-@if (clients == null)
+@if (slopes == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -22,34 +22,26 @@ else
         <button class="btn btn-success" style="margin-left: 3px;" @onclick="ExportAsCsv">CSV</button>
         <button class="btn btn-info" style="margin-left: 3px;" @onclick="ExportAsXml">XML</button>
         <button class="btn btn-warning" style="margin-left: 3px;" @onclick="ExportAsJson">JSON</button>
-        @if (role == "admin")
-        {
-            <button class="btn btn-success" style="margin-left: 100px;" @onclick="() => CreateClient()">Create</button>
-            <button class="btn btn-info" style="margin-left: 3px;" @onclick="ImportJson">Import JSON</button>
-        }
     </div>
 
     <table class="table">
         <thead>
             <tr>
-                <th @onclick="() => ApplySorting(nameof(ClientDto.FirstName))">First Name</th>
-                <th @onclick="() => ApplySorting(nameof(ClientDto.LastName))">Last Name</th>
-                <th @onclick="() => ApplySorting(nameof(ClientDto.Phone))">Phone</th>
-                <th @onclick="() => ApplySorting(nameof(ClientDto.Email))">Email</th>
+                <th @onclick="() => ApplySorting(nameof(SlopeDto.Name))">Name</th>
+                <th @onclick="() => ApplySorting(nameof(SlopeDto.DifficultyLevel))">Difficulty Level</th>
+                <th @onclick="() => ApplySorting(nameof(SlopeDto.Status))">Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var client in clients)
+            @foreach (var slope in slopes)
             {
                 <tr>
-                    <td>@client.FirstName</td>
-                    <td>@client.LastName</td>
-                    <td>@client.Phone</td>
-                    <td>@client.Email</td>
+                    <td>@slope.Name</td>
+                    <td>@slope.DifficultyLevel</td>
+                    <td>@slope.Status</td>
                     <td>
-                        <button class="btn btn-primary btn-sm" @onclick="() => UpdateClient(client)">Update</button>
-                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteClient(client)">Delete</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteSlope(slope)">Delete</button>
                     </td>
                 </tr>
             }
@@ -72,7 +64,7 @@ else
     }
     else
     {
-        @if (clients.Count() == req.PageSize)
+        @if (slopes.Count() == req.PageSize)
         {
             <div class="d-flex justify-content-center align-items-center mt-3">
                 <button class="btn btn-primary btn-lg m-2" @onclick="LoadPrevious">
@@ -91,8 +83,8 @@ else
 
 @code {
     private SkiResortApiClient? skiResortApiClient;
-    private ClientDto selectedClient = new ClientDto();
-    private List<ClientDto>? clients;
+    private SlopeDto selectedSlope = new SlopeDto();
+    private List<SlopeDto>? slopes;
     private int seedDataCount;
     public string name = default;
     public string role = default;
@@ -101,7 +93,7 @@ else
         {
             PageIndex = 1,
             PageSize = 10,
-            SortBy = nameof(ClientDto.Id),
+            SortBy = nameof(SlopeDto.Id),
             Ascending = true,
             Filter = "",
         };
@@ -115,32 +107,32 @@ else
         }
         catch (Exception ex) { };
         skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
-        clients = await LoadData(req);
+        slopes = await LoadData(req);
     }
 
-    private async Task<List<ClientDto>> LoadData(PaginationSortingRequest req)
+    private async Task<List<SlopeDto>> LoadData(PaginationSortingRequest req)
     {
-        return (await skiResortApiClient!.ClientGetPaginatedSortedAsync(req)).ToList();
+        return (await skiResortApiClient!.SlopeGetPaginatedSortedAsync(req)).ToList();
     }
 
-    private async Task UpdateClient(ClientDto client)
+    private async Task UpdateSlope(SlopeDto slope)
     {
-        NavigationManager.NavigateTo($"/client-update/{client.Id}", true);
+        NavigationManager.NavigateTo($"/slope-update/{slope.Id}", true);
     }
 
-    private async Task DeleteClient(ClientDto client)
+    private async Task DeleteSlope(SlopeDto slope)
     {
-        var confirmed = await JsInterop.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {client.FirstName} {client.LastName}?");
+        var confirmed = await JsInterop.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {slope.Name}");
         if (confirmed)
         {
-            await skiResortApiClient.ClientDELETEAsync(client);
-            clients.Remove(client);
+            await skiResortApiClient.SlopeDELETEAsync(slope);
+            slopes.Remove(slope);
         }
     }
 
-    private async Task CreateClient()
+    private async Task CreateSlope()
     {
-        NavigationManager.NavigateTo("/add-client", true);
+        NavigationManager.NavigateTo("/add-slope", true);
     }
 
     private async Task ImportJson()
@@ -148,30 +140,29 @@ else
         var jsonData = await JsInterop.InvokeAsync<string>("uploadFile");
         if (!string.IsNullOrEmpty(jsonData))
         {
-            var newClients = JsonSerializer.Deserialize<List<ClientDto>>(jsonData);
-            if (newClients != null)
+            var newSlopes = JsonSerializer.Deserialize<List<SlopeDto>>(jsonData);
+            if (newSlopes != null)
             {
-                foreach (var client in newClients)
+                foreach (var slope in newSlopes)
                 {
-                    await CreateClientFromJson(client);
+                    await CreateSlopeFromJson(slope);
                 }
-                clients = await LoadData(req);
+                slopes = await LoadData(req);
             }
         }
-        NavigationManager.NavigateTo("/clients", true);
+        NavigationManager.NavigateTo("/slopes", true);
     }
 
-    private async Task CreateClientFromJson(ClientDto client)
+    private async Task CreateSlopeFromJson(SlopeDto slope)
     {
-        var clientDto = new CreateClientDto()
+        var slopeDto = new CreateSlopeDto()
             {
-                FirstName = client.FirstName,
-                LastName = client.LastName,
-                Phone = client.Phone,
-                Email = client.Email,
+                Name = slope.Name,
+                DifficultyLevel = slope.DifficultyLevel,
+                Status = slope.Status,
             };
 
-        await skiResortApiClient!.ClientPOSTAsync(clientDto);
+        await skiResortApiClient!.SlopePOSTAsync(slopeDto);
     }
 
 
@@ -194,7 +185,7 @@ else
         }
 
         req.PageIndex++;
-        clients = res;
+        slopes = res;
     }
 
     private async Task LoadPrevious()
@@ -202,7 +193,7 @@ else
         if (req.PageIndex > 1)
         {
             req.PageIndex--;
-            clients = await LoadData(req);
+            slopes = await LoadData(req);
         }
     }
 
@@ -218,51 +209,51 @@ else
             req.Ascending = true;
         }
 
-        clients = await LoadData(req);
+        slopes = await LoadData(req);
     }
 
     private async Task ApplyFilter(KeyboardEventArgs args)
     {
         req.PageIndex = 1;
-        clients = await LoadData(req);
+        slopes = await LoadData(req);
     }
 
     private async Task ExportAsCsv()
     {
-        var csvData = GenerateCsv(clients);
-        await SaveAsFile("clients.csv", csvData);
+        var csvData = GenerateCsv(slopes);
+        await SaveAsFile("slopes.csv", csvData);
     }
 
     private async Task ExportAsXml()
     {
-        var xmlData = GenerateXml(clients);
-        await SaveAsFile("clients.xml", xmlData);
+        var xmlData = GenerateXml(slopes);
+        await SaveAsFile("slopes.xml", xmlData);
     }
 
     private async Task ExportAsJson()
     {
-        var jsonData = JsonSerializer.Serialize(clients);
-        await SaveAsFile("clients.json", jsonData);
+        var jsonData = JsonSerializer.Serialize(slopes);
+        await SaveAsFile("slopes.json", jsonData);
     }
 
-    private string GenerateCsv(List<ClientDto> clients)
+    private string GenerateCsv(List<SlopeDto> slopes)
     {
         var stringBuilder = new StringBuilder();
         stringBuilder.AppendLine("Id,FirstName,LastName,Phone,Email");
 
-        foreach (var client in clients)
+        foreach (var slope in slopes)
         {
-            stringBuilder.AppendLine($"{client.Id},{client.FirstName},{client.LastName},{client.Phone},{client.Email}");
+            stringBuilder.AppendLine($"{slope.Id},{slope.Name},{slope.DifficultyLevel},{slope.Status}");
         }
 
         return stringBuilder.ToString();
     }
 
-    private string GenerateXml(List<ClientDto> clients)
+    private string GenerateXml(List<SlopeDto> slopes)
     {
-        var xmlSerializer = new XmlSerializer(typeof(List<ClientDto>));
+        var xmlSerializer = new XmlSerializer(typeof(List<SlopeDto>));
         using var stringWriter = new StringWriter();
-        xmlSerializer.Serialize(stringWriter, clients);
+        xmlSerializer.Serialize(stringWriter, slopes);
         return stringWriter.ToString();
     }
 

@@ -24,6 +24,8 @@ namespace SkiResort.Presentation.Controllers
     [ApiController]
     public class SeedController : ControllerBase
     {
+        private readonly IEntityRepositoryBase<int, Role> roleRepository;
+        private readonly IEntityRepositoryBase<int, User> userRepository;
         private readonly IEntityRepositoryBase<int, Client> clientRepository;
         private readonly IEntityRepositoryBase<int, Event> eventRepository;
         private readonly IEntityRepositoryBase<int, Instructor> instructorRepository;
@@ -39,6 +41,8 @@ namespace SkiResort.Presentation.Controllers
         private readonly IEntityRepositoryBase<int, MaintenanceRequest> maintenanceRequestRepository;
         private readonly IEntityRepositoryBase<int, EquipmentRental> equipmentRentalRepository;
         public SeedController(
+            IEntityRepositoryBase<int, Role> roleRepository,
+            IEntityRepositoryBase<int, User> userRepository,
             IEntityRepositoryBase<int, Client> clientRepository,
             IEntityRepositoryBase<int, Event> eventRepository,
             IEntityRepositoryBase<int, Instructor> instructorRepository,
@@ -54,6 +58,8 @@ namespace SkiResort.Presentation.Controllers
             IEntityRepositoryBase<int, EquipmentRental> equipmentRentalRepository,
             IEntityRepositoryBase<int, MaintenanceRequest> maintenanceRequestRepository)
         {
+            this.roleRepository = roleRepository ?? throw new ArgumentNullException(nameof(roleRepository));
+            this.userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
             this.clientRepository = clientRepository ?? throw new ArgumentNullException(nameof(clientRepository));
             this.eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
             this.instructorRepository = instructorRepository ?? throw new ArgumentNullException(nameof(instructorRepository));
@@ -73,6 +79,18 @@ namespace SkiResort.Presentation.Controllers
         [HttpPost("Seed")]
         public async Task Seed(int coef)
         {
+            //Add roles and users
+            Role admin = new Role() { RoleName = "admin", Users = new List<User>() };
+            Role manager = new Role() { RoleName = "manager", Users = new List<User>() };
+            await roleRepository.Create(admin);
+            await roleRepository.Create(manager);
+
+            User adminUsr = new User() { Username = "admin", Password = "admin", Email = "admin@gmail.com", Role = admin, RoleId = admin.Id, LastLogin = DateTime.Now.ToUniversalTime() };
+            User namagerUsr = new User() { Username = "manager", Password = "manager", Email = "manager@gmail.com", Role = manager, RoleId = manager.Id, LastLogin = DateTime.Now.ToUniversalTime() };
+
+            await userRepository.Create(adminUsr);
+            await userRepository.Create(namagerUsr);
+
             //Add clients
             var clientDto = new List<CreateClientDto>();
             for (int i = 0; i < coef; i++)
