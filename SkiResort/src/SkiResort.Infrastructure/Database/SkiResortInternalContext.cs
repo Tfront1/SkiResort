@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SkiResort.Domain.dbo;
+using SkiResort.Infrastructure.Extensions;
 
 namespace SkiResort.Infrastructure.Database;
 
@@ -27,7 +28,8 @@ public class SkiResortInternalContext : DbContext
     public DbSet<WeatherReport> WeatherReports { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
-
+    public DbSet<ClientEventCount> ClientEventCounts { get; set; }
+    public DbSet<InstructorLessonCount> InstructorLessonCounts { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -48,5 +50,10 @@ public class SkiResortInternalContext : DbContext
         modelBuilder.ApplyConfiguration(new Configurations.WeatherReportConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.UserConfiguration());
         modelBuilder.ApplyConfiguration(new Configurations.RoleConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.RoleConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.ClientEventCountsConfiguration());
+        modelBuilder.ApplyConfiguration(new Configurations.InstructorLessonCountsConfiguration());
+
+        modelBuilder.ConvertToSnakeCase();
     }
 }

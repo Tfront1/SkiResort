@@ -12,8 +12,8 @@ using SkiResort.Infrastructure.Database;
 namespace SkiResort.Infrastructure.Migrations
 {
     [DbContext(typeof(SkiResortInternalContext))]
-    [Migration("20240419213520_Init")]
-    partial class Init
+    [Migration("20240501181200_Views")]
+    partial class Views
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,422 +29,550 @@ namespace SkiResort.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CheckInDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("check_in_date");
 
                     b.Property<DateTime>("CheckOutDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("check_out_date");
 
                     b.Property<int>("ClientId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("client_id");
 
                     b.Property<int>("RoomId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("room_id");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("status");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_bookings");
 
                     b.HasIndex("ClientId");
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("bookings");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Client", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_of_birth");
 
                     b.Property<string>("Email")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("email");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("first_name");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("last_name");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("phone");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_clients");
 
-                    b.ToTable("Clients");
+                    b.ToTable("clients");
+                });
+
+            modelBuilder.Entity("SkiResort.Domain.dbo.ClientEventCount", b =>
+                {
+                    b.Property<int>("CountOfEvents")
+                        .HasColumnType("integer")
+                        .HasColumnName("count_of_events");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("first_name");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.ToTable("client_event_counts");
+
+                    b.ToView("ClientEventsCount", (string)null);
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Equipment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_equipments");
 
-                    b.ToTable("Equipments");
+                    b.ToTable("equipments");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.EquipmentRental", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ClientId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("client_id");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
 
                     b.Property<int>("EquipmentId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("equipment_id");
 
                     b.Property<decimal>("RentalPrice")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("rental_price");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_equipment_rentals");
 
                     b.HasIndex("ClientId");
 
                     b.HasIndex("EquipmentId");
 
-                    b.ToTable("EquipmentRentals");
+                    b.ToTable("equipment_rentals");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Event", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
 
                     b.Property<string>("Location")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("location");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_events");
 
-                    b.ToTable("Events");
+                    b.ToTable("events");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Instructor", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("first_name");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("last_name");
 
                     b.Property<string>("Specialization")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("specialization");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_instructors");
 
-                    b.ToTable("Instructors");
+                    b.ToTable("instructors");
+                });
+
+            modelBuilder.Entity("SkiResort.Domain.dbo.InstructorLessonCount", b =>
+                {
+                    b.Property<int>("CountOfLessons")
+                        .HasColumnType("integer")
+                        .HasColumnName("count_of_lessons");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("first_name");
+
+                    b.Property<int>("InstructorId")
+                        .HasColumnType("integer")
+                        .HasColumnName("instructor_id");
+
+                    b.ToTable("instructor_lesson_counts");
+
+                    b.ToView("InstructorLessonsCount", (string)null);
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.MaintenanceRequest", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
 
                     b.Property<int>("EquipmentId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("equipment_id");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("status");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_maintenance_requests");
 
                     b.HasIndex("EquipmentId");
 
-                    b.ToTable("MaintenanceRequests");
+                    b.ToTable("maintenance_requests");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("RoleName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("role_name");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_roles");
 
-                    b.ToTable("Roles");
+                    b.ToTable("roles");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Room", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("Capacity")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("capacity");
 
                     b.Property<decimal>("PricePerNight")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("price_per_night");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("type");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_rooms");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("rooms");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Service", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("description");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("price");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_services");
 
-                    b.ToTable("Services");
+                    b.ToTable("services");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.ServiceOrder", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ClientId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("client_id");
 
                     b.Property<DateTime>("OrderDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("order_date");
 
                     b.Property<int>("ServiceId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("service_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_service_orders");
 
                     b.HasIndex("ClientId");
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("ServiceOrders");
+                    b.ToTable("service_orders");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.SkiLesson", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ClientId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("client_id");
 
                     b.Property<TimeSpan>("Duration")
-                        .HasColumnType("interval");
+                        .HasColumnType("interval")
+                        .HasColumnName("duration");
 
                     b.Property<int>("InstructorId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("instructor_id");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_ski_lessons");
 
                     b.HasIndex("ClientId");
 
                     b.HasIndex("InstructorId");
 
-                    b.ToTable("SkiLessons");
+                    b.ToTable("ski_lessons");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Slope", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("DifficultyLevel")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("difficulty_level");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.Property<string>("Status")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("status");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_slopes");
 
-                    b.ToTable("Slopes");
+                    b.ToTable("slopes");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Ticket", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ClientId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("client_id");
 
                     b.Property<int>("EventId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("event_id");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("price");
 
                     b.Property<DateTime>("PurchaseDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("purchase_date");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_tickets");
 
                     b.HasIndex("ClientId");
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("Tickets");
+                    b.ToTable("tickets");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("email");
 
                     b.Property<DateTime>("LastLogin")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_login");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("password");
 
                     b.Property<int>("RoleId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("role_id");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("username");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_users");
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.WeatherReport", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date");
 
                     b.Property<int>("Temperature")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("temperature");
 
                     b.Property<string>("WeatherCondition")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("weather_condition");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_weather_reports");
 
-                    b.ToTable("WeatherReports");
+                    b.ToTable("weather_reports");
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Booking", b =>
@@ -453,13 +581,15 @@ namespace SkiResort.Infrastructure.Migrations
                         .WithMany("Bookings")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_bookings_clients_client_id");
 
                     b.HasOne("SkiResort.Domain.dbo.Room", "Room")
                         .WithMany("Bookings")
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_bookings_rooms_room_id");
 
                     b.Navigation("Client");
 
@@ -472,13 +602,15 @@ namespace SkiResort.Infrastructure.Migrations
                         .WithMany("EquipmentRentals")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_equipment_rentals_clients_client_id");
 
                     b.HasOne("SkiResort.Domain.dbo.Equipment", "Equipment")
                         .WithMany("EquipmentRentals")
                         .HasForeignKey("EquipmentId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_equipment_rentals_equipments_equipment_id");
 
                     b.Navigation("Client");
 
@@ -491,7 +623,8 @@ namespace SkiResort.Infrastructure.Migrations
                         .WithMany("MaintenanceRequests")
                         .HasForeignKey("EquipmentId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_maintenance_requests_equipments_equipment_id");
 
                     b.Navigation("Equipment");
                 });
@@ -502,13 +635,15 @@ namespace SkiResort.Infrastructure.Migrations
                         .WithMany("ServiceOrders")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_service_orders_clients_client_id");
 
                     b.HasOne("SkiResort.Domain.dbo.Service", "Service")
                         .WithMany("ServiceOrders")
                         .HasForeignKey("ServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_service_orders_services_service_id");
 
                     b.Navigation("Client");
 
@@ -521,13 +656,15 @@ namespace SkiResort.Infrastructure.Migrations
                         .WithMany("SkiLessons")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_ski_lessons_clients_client_id");
 
                     b.HasOne("SkiResort.Domain.dbo.Instructor", "Instructor")
                         .WithMany("SkiLessons")
                         .HasForeignKey("InstructorId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_ski_lessons_instructors_instructor_id");
 
                     b.Navigation("Client");
 
@@ -540,13 +677,15 @@ namespace SkiResort.Infrastructure.Migrations
                         .WithMany("Tickets")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_tickets_clients_client_id");
 
                     b.HasOne("SkiResort.Domain.dbo.Event", "Event")
                         .WithMany("Tickets")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_tickets_events_event_id");
 
                     b.Navigation("Client");
 
@@ -559,7 +698,8 @@ namespace SkiResort.Infrastructure.Migrations
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_users_roles_role_id");
 
                     b.Navigation("Role");
                 });
