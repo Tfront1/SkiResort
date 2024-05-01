@@ -22,6 +22,7 @@ else
         <button class="btn btn-success" style="margin-left: 3px;" @onclick="ExportAsCsv">CSV</button>
         <button class="btn btn-info" style="margin-left: 3px;" @onclick="ExportAsXml">XML</button>
         <button class="btn btn-warning" style="margin-left: 3px;" @onclick="ExportAsJson">JSON</button>
+        <button class="btn btn-success" style="margin-left: 30px;" @onclick="ViewChart">Chart</button>
     </div>
 
     <table class="table">
@@ -72,6 +73,11 @@ else
     private async Task<List<ClientEventCountModel>> LoadData()
     {
         return (await skiResortApiClient!.ClientEventCountGetAllAsync()).ToList();
+    }
+
+    private async Task ViewChart()
+    {
+        NavigationManager.NavigateTo($"/clientEventChart", true);
     }
 
     private async Task ExportAsCsv()

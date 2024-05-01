@@ -1,0 +1,57 @@
+﻿@page "/clientEventChart"
+@using System.Net.Http.Json
+@using Mapster
+@using SkiResort.Frontend.Presentation.Services
+@inject IHttpApiClientFactory HttpApiClientFactory
+@inject IJSRuntime JsInterop
+@inject NavigationManager NavigationManager
+
+<h3>Client Event Distribution Chart</h3>
+
+<div class="chart-container" style="position: relative; height:40vh; width:80vw">
+    <canvas id="clientEventChart"></canvas>
+</div>
+
+<button class="btn btn-primary" @onclick="GoBack">Back to List</button>
+
+@code {
+    private SkiResortApiClient? skiResortApiClient;
+    private List<ClientEventCountModel>? clientEventCounts;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        skiResortApiClient = await HttpApiClientFactory.GetSkiResortApiHttpClientAsync();
+        clientEventCounts = await LoadData();
+        await RenderChart();
+    }
+    private async Task<List<ClientEventCountModel>> LoadData()
+    {
+        return (await skiResortApiClient!.ClientEventCountGetAllAsync()).ToList();
+    }
+
+    private async Task RenderChart()
+    {
+        var clientEventsData = clientEventCounts.Select(c => new { c.CountOfEvents, c.FirstName }).ToList();
+        var data = new
+        {
+            labels = clientEventsData.Select(x => x.FirstName).ToArray(),
+            datasets = new[]
+            {
+                new {
+                    label = "Event Count",
+                    backgroundColor = "rgba(255, 99, 132, 0.2)",
+                    borderColor = "rgba(255, 99, 132, 1)",
+                    borderWidth = 1,
+                    data = clientEventsData.Select(x => x.CountOfEvents).ToArray()
+                }
+            }
+        };
+
+        await JsInterop.InvokeVoidAsync("createChart", "clientEventChart", data);
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/clientEventCounts");
+    }
+}
