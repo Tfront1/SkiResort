@@ -11,9 +11,9 @@ public static class ClientEventsCountViewCode
     public static string Code { get; set; } = @"
     CREATE VIEW client_events_count AS
     SELECT 
-        c.id AS ClientId,
-        c.first_name AS FirstName,
-        COUNT(t.id) AS CountOfEvents
+        c.id AS client_id,
+        c.first_name AS first_name,
+        COUNT(t.id) AS count_of_events
     FROM 
         clients c
     LEFT JOIN 

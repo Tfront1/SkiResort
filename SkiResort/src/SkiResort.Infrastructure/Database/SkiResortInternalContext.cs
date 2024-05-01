@@ -28,8 +28,8 @@ public class SkiResortInternalContext : DbContext
     public DbSet<WeatherReport> WeatherReports { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Role> Roles { get; set; }
-    public DbSet<ClientEventCount> ClientEventCounts { get; set; }
-    public DbSet<InstructorLessonCount> InstructorLessonCounts { get; set; }
+    public DbSet<ClientEventCountModel> ClientEventCounts { get; set; }
+    public DbSet<InstructorLessonCountModel> InstructorLessonCounts { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

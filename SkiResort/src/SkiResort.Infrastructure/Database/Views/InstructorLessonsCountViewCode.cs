@@ -11,9 +11,9 @@ public static class InstructorLessonsCountViewCode
     public static string Code { get; set; } = @"
     CREATE VIEW instructor_lessons_count AS
     SELECT 
-        i.id AS InstructorId,
-        i.first_name AS FirstName,
-        COUNT(sl.id) AS CountOfLessons
+        i.id AS instructor_id,
+        i.first_name AS first_name,
+        COUNT(sl.id) AS count_of_lessons
     FROM 
         instructors i
     LEFT JOIN 

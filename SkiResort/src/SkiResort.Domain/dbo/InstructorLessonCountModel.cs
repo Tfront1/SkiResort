@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace SkiResort.Domain.dbo;
 
-public class ClientEventCount
+public class InstructorLessonCountModel
 {
-    public int UserId { get; set; }
+    public int InstructorId { get; set; }
     public string FirstName { get; set; }
-    public int CountOfEvents { get; set; }
+    public int CountOfLessons { get; set; }
 }

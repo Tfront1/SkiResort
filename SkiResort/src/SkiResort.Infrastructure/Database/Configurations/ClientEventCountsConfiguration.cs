@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace SkiResort.Infrastructure.Database.Configurations;
 
-public class ClientEventCountsConfiguration : IEntityTypeConfiguration<ClientEventCount>
+public class ClientEventCountsConfiguration : IEntityTypeConfiguration<ClientEventCountModel>
 {
-    public void Configure(EntityTypeBuilder<ClientEventCount> builder)
+    public void Configure(EntityTypeBuilder<ClientEventCountModel> builder)
     {
         builder.HasNoKey();
-        builder.ToView("ClientEventsCount");
+        builder.ToView("client_events_count");
     }
 }

@@ -27,6 +27,7 @@ else
     <table class="table">
         <thead>
             <tr>
+                <th @onclick="() => ApplySorting(nameof(RoleDto.Id))">Id</th>
                 <th @onclick="() => ApplySorting(nameof(RoleDto.RoleName))">RoleName</th>
                 <th>Actions</th>
             </tr>
@@ -35,7 +36,8 @@ else
             @foreach (var role in roles)
             {
                 <tr>
-                    <td>@role.RoleName</td>
+                    <td>@role.Id</td>
+                    <td>@role.RoleName</td>    
                     <td>
                         <button class="btn btn-danger btn-sm" @onclick="() => DeleteRole(role)">Delete</button>
                     </td>

@@ -12,8 +12,8 @@ using SkiResort.Infrastructure.Database;
 namespace SkiResort.Infrastructure.Migrations
 {
     [DbContext(typeof(SkiResortInternalContext))]
-    [Migration("20240501181146_Init")]
-    partial class Init
+    [Migration("20240501222317_Views")]
+    partial class Views
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -104,8 +104,12 @@ namespace SkiResort.Infrastructure.Migrations
                     b.ToTable("clients");
                 });
 
-            modelBuilder.Entity("SkiResort.Domain.dbo.ClientEventCount", b =>
+            modelBuilder.Entity("SkiResort.Domain.dbo.ClientEventCountModel", b =>
                 {
+                    b.Property<int>("ClientId")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_id");
+
                     b.Property<int>("CountOfEvents")
                         .HasColumnType("integer")
                         .HasColumnName("count_of_events");
@@ -115,13 +119,9 @@ namespace SkiResort.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("first_name");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
-
                     b.ToTable("client_event_counts");
 
-                    b.ToView("ClientEventsCount", (string)null);
+                    b.ToView("client_events_count", (string)null);
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.Equipment", b =>
@@ -247,7 +247,7 @@ namespace SkiResort.Infrastructure.Migrations
                     b.ToTable("instructors");
                 });
 
-            modelBuilder.Entity("SkiResort.Domain.dbo.InstructorLessonCount", b =>
+            modelBuilder.Entity("SkiResort.Domain.dbo.InstructorLessonCountModel", b =>
                 {
                     b.Property<int>("CountOfLessons")
                         .HasColumnType("integer")
@@ -264,7 +264,7 @@ namespace SkiResort.Infrastructure.Migrations
 
                     b.ToTable("instructor_lesson_counts");
 
-                    b.ToView("InstructorLessonsCount", (string)null);
+                    b.ToView("instructor_lessons_count", (string)null);
                 });
 
             modelBuilder.Entity("SkiResort.Domain.dbo.MaintenanceRequest", b =>

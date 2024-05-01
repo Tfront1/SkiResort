@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace SkiResort.Infrastructure.Database.Configurations;
 
-public class InstructorLessonCountsConfiguration : IEntityTypeConfiguration<InstructorLessonCount>
+public class InstructorLessonCountsConfiguration : IEntityTypeConfiguration<InstructorLessonCountModel>
 {
-    public void Configure(EntityTypeBuilder<InstructorLessonCount> builder)
+    public void Configure(EntityTypeBuilder<InstructorLessonCountModel> builder)
     {
         builder.HasNoKey();
-        builder.ToView("InstructorLessonsCount");
+        builder.ToView("instructor_lessons_count");
     }
 }
